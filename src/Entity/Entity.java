@@ -2,14 +2,14 @@ package Entity;
 
 public abstract class Entity {
     private int hp; //domyslnie 1 dla poczatkowej wersji gry
-    private byte radious; //typ zmiennej zalezny od skali osi wspolrzednych (do ustalenia)
+    private byte radius; //typ zmiennej zalezny od skali osi wspolrzednych (do ustalenia)
     private float angle; //kat obrotu jako wartosc zmienno-przecinkowa - wieksza dokladnosc
     private int[] position = new int[2]; //dwie wartosci x i y oznaczajace pozycje
     private int movementSpeed; //poniewaz enemy i bullet ma, a u pleyera domyslne bd 0
 
-    public Entity(int hp, byte radious, float angle, int[] position, int movementSpeed) {
+    public Entity(int hp, byte radius, float angle, int[] position, int movementSpeed) {
         this.hp = hp;
-        this.radious = radious;
+        this.radius = radius;
         this.angle = angle;
         this.position = position;
         this.movementSpeed = movementSpeed;
@@ -19,12 +19,12 @@ public abstract class Entity {
         return hp;
     }
 
-    public byte getRadious() {
-        return radious;
+    public byte getRadius() {
+        return radius;
     }
 
-    public void setRadious(byte radious) {
-        this.radious = radious;
+    public void setRadius(byte radius) {
+        this.radius = radius;
     }
     //mozemy zrobic tak, ze po otrzymaniu damageu enemy bedzie zmniejszal swoj
     //promien, co bedzie prostym sposobem na przedstawienie ile zostalo mu hp
