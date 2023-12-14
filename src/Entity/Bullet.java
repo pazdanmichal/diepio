@@ -3,9 +3,9 @@ package Entity;
 public class Bullet extends Entity {
     private boolean isAlly;
 
-    public Bullet(int hp, byte radious, float angle,
+    public Bullet(int hp, byte radius, float angle,
                   int[] position, int movementSpeed, boolean isAlly) {
-        super(hp, radious, angle, position, movementSpeed);
+        super(hp, radius, angle, position, movementSpeed);
         this.isAlly = isAlly;
     }
 
