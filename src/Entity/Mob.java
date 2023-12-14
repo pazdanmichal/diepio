@@ -5,9 +5,9 @@ public abstract class Mob extends Entity {
     private int attackFrequency;
     private int damage;
 
-    public Mob(int hp, byte radious, float angle, int[] position,
+    public Mob(int hp, byte radius, float angle, int[] position,
                int movementSpeed, boolean canShoot, int attackFrequency, int damage) {
-        super(hp, radious, angle, position, movementSpeed);
+        super(hp, radius, angle, position, movementSpeed);
         this.canShoot = canShoot;
         this.attackFrequency = attackFrequency;
         this.damage = damage;
