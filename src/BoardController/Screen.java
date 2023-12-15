@@ -123,11 +123,12 @@ public class Screen extends BoardController{
 
         boolean playerFound = true;
 
-        ArrayList <Entity> entitiesToAdd = new ArrayList <>();
 
         long startTime = System.currentTimeMillis();
+        long frame = 0;
 
         while (!glfwWindowShouldClose(window) && playerFound) {
+            frame += 1;
 
             entityCollider.RenderStep(this.getEntityTable());
             entityCollider.CheckColisions(this.getEntityTable());
@@ -137,6 +138,11 @@ public class Screen extends BoardController{
 
 
             ArrayList <Entity> currentEntityTable = entityCollider.getEntityTable();
+
+            if (frame%100 == 0){
+                this.addEntity(new Enemy(10, 20, 180, new float[] {450, 0}, 1, false, 0, 0));
+            }
+
 
 
             if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) {
@@ -154,9 +160,9 @@ public class Screen extends BoardController{
                             double angleRad = Math.toRadians(rotation);
 
                             // Calculate the end point of the line based on length and angle
-                            float endX = currentPosition[0] + currentEntityTable.get(i).getRadius()*1.7f * (float) Math.cos(angleRad);
-                            float endY = currentPosition[1] + currentEntityTable.get(i).getRadius()*1.7f * (float) Math.sin(angleRad);
-                            this.addEntity(new Bullet(currentPlayer.getDamage(), 20.0f, currentPlayer.getAngle(), new float[] {endX, endY}, 7, true));
+                            float endX = currentPosition[0] + currentPlayer.getRadius()*currentPlayer.getGunLengthMultiply() * (float) Math.cos(angleRad);
+                            float endY = currentPosition[1] + currentPlayer.getRadius()*currentPlayer.getGunLengthMultiply() * (float) Math.sin(angleRad);
+                            this.addEntity(new Bullet(currentPlayer.getDamage(), currentPlayer.getRadius() * currentPlayer.getGunWidthMultiply() * 0.8f, currentPlayer.getAngle(), new float[] {endX, endY}, currentPlayer.getBulletSPeed(), true));
                             currentPlayer.setShootTime(elapsedTime);
                         }
                     }
@@ -204,7 +210,7 @@ public class Screen extends BoardController{
 
                 if (currentEntityTable.get(i) instanceof Player){
                     playerFound = true;
-                    drawLine(0.4f, 0.4f, 0.4f, currentEntityTable.get(i).getPosition()[0], currentEntityTable.get(i).getPosition()[1], currentEntityTable.get(i).getRadius()*1.7f, currentEntityTable.get(i).getRadius()*0.65f, currentEntityTable.get(i).getAngle());
+                    drawLine(0.4f, 0.4f, 0.4f, currentEntityTable.get(i).getPosition()[0], currentEntityTable.get(i).getPosition()[1], currentEntityTable.get(i).getRadius()*((Player) currentEntityTable.get(i)).getGunLengthMultiply(), currentEntityTable.get(i).getRadius()*((Player) currentEntityTable.get(i)).getGunWidthMultiply(), currentEntityTable.get(i).getAngle());
                     drawCircle(0, 0.75f, 1, currentEntityTable.get(i).getRadius(), currentEntityTable.get(i).getPosition()[0], currentEntityTable.get(i).getPosition()[1]);
 
                 } else if (currentEntityTable.get(i) instanceof Enemy) {

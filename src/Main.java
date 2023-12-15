@@ -8,7 +8,7 @@ public class Main {
         Screen currentScreen = new Screen(900, 900);
 
         ArrayList<Entity> currentEntityTable = new ArrayList<Entity>();
-        currentEntityTable.add(new Player(100, 50.0f, 90.0f, new float[]{0.0f, 0.0f}, 0, true, 200, 10, (byte) 0, 2));
+        currentEntityTable.add(new Player(100, 50.0f, 270.0f, new float[]{0.0f, 0.0f}, 0, true, 200, 1000, (byte) 0, 2, 1.7f, 0.65f, 7));
 
         currentScreen.setEntityTable(currentEntityTable);
 

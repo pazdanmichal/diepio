@@ -3,12 +3,18 @@ package Entity;
 public class Player extends Mob{
     private byte currentRotation;//-1 -> lewo; 0 -> stoi; 1 -> prawo
     private int rotationSpeed;
+    private float gunWidthMultiply;
+    private float gunLengthMultiply;
+    private int bulletSPeed;
 
     public Player(int hp, float radius, float angle, float[] position, int movementSpeed, boolean canShoot,
-                  float attackFrequency, int damage, byte currentRotation, int rotationSpeed) {
+                  float attackFrequency, int damage, byte currentRotation, int rotationSpeed, float gunLengthMultiply, float gunWidthMultiply, int bulletSpeed) {
         super(hp, radius, angle, position, movementSpeed, canShoot, attackFrequency, damage);
         this.currentRotation = currentRotation;
         this.rotationSpeed = rotationSpeed;
+        this.gunLengthMultiply = gunLengthMultiply;
+        this.gunWidthMultiply = gunWidthMultiply;
+        this.bulletSPeed = bulletSpeed;
     }
     public Player() {
         super();
@@ -35,5 +41,29 @@ public class Player extends Mob{
 
     public void Die(){
         //przyslonieta metoda dla klasy player -> zakonczenie rozgrywki
+    }
+
+    public float getGunWidthMultiply() {
+        return gunWidthMultiply;
+    }
+
+    public float getGunLengthMultiply() {
+        return gunLengthMultiply;
+    }
+
+    public void setGunWidthMultiply(float gunWidthMultiply) {
+        this.gunWidthMultiply = gunWidthMultiply;
+    }
+
+    public void setGunLengthMultiply(float gunLengthMultiply) {
+        this.gunLengthMultiply = gunLengthMultiply;
+    }
+
+    public int getBulletSPeed() {
+        return bulletSPeed;
+    }
+
+    public void setBulletSPeed(int bulletSPeed) {
+        this.bulletSPeed = bulletSPeed;
     }
 }

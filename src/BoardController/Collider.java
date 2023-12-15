@@ -15,12 +15,9 @@ public class Collider extends BoardController{
             //jesli obiekt ma klase player to go oborc
             if(entityTable.get(i) instanceof Player){
                 Player currentPlayer = (Player)entityTable.get(i);
-                System.out.println(currentPlayer.getCurrentRotation());
                 if(currentPlayer.getCurrentRotation() == (byte) -1){
-                    System.out.println("nigger");
                     currentPlayer.setAngle(currentPlayer.getAngle() - currentPlayer.getRotationSpeed());
                 } else if (currentPlayer.getCurrentRotation() == (byte) 1) {
-                    System.out.println("czarnuch");
                     currentPlayer.setAngle(currentPlayer.getAngle() + currentPlayer.getRotationSpeed());
                 }
             }
@@ -98,61 +95,54 @@ public class Collider extends BoardController{
                 Enemy currentEnemy = (Enemy) enemyTable.get(j);
                 if(Math.sqrt(Math.pow((currentEnemy.getPosition()[0]-currentBullet.getPosition()[0]),2)+
                         Math.pow((currentEnemy.getPosition()[1]-currentBullet.getPosition()[1]),2))
-                        <=currentEnemy.getRadius()+currentBullet.getRadius());{
+                        <=currentEnemy.getRadius()+currentBullet.getRadius()){
                             if(currentBullet.getHp()>currentEnemy.getHp()){
                                 currentBullet.setHp(currentBullet.getHp()-currentEnemy.getHp());
                                 //zabijanie enemy i array j cofniety o jeden to tylu
-                                currentEnemy.Die();
-                                enemyTable.remove(j);
-                                j--;
+                                currentEnemy.setHp(0);
                             }
-                            if(currentBullet.getHp()<currentEnemy.getHp()){
+                            else if(currentBullet.getHp()<currentEnemy.getHp()){
                                  currentEnemy.setHp(currentEnemy.getHp()-currentBullet.getHp());
                                  //zabijanie bulleta i array i cofniety o jeden to tylu
-                                 currentBullet.Die();
-                                 allybulletTable.remove(i);
-                                 i--;
+                                 currentBullet.setHp(0);
                             }
                             else{
                                 //zabijanie bulleta i array i cofniety o jeden to tylu
                                 //zabijanie enemy i array j cofniety o jeden to tylu
-                                currentEnemy.Die();
-                                currentBullet.Die();
-                                enemyTable.remove(j);
-                                j--;
-                                allybulletTable.remove(i);
-                                i--;
+                                currentEnemy.setHp(0);
+                                currentBullet.setHp(0);
                             }
                 }
             }
         }
 
+
+
         //kolizja enemy/player
         for (int i = 0; i< enemyTable.size(); i++){
             Enemy currentEnemy = (Enemy) enemyTable.get(i);
-
             if(Math.sqrt(Math.pow((currentEnemy.getPosition()[0]-player.getPosition()[0]),2)+
                     Math.pow((currentEnemy.getPosition()[1]-player.getPosition()[1]),2))
                     <=currentEnemy.getRadius()+player.getRadius()){
                 if(player.getHp()>currentEnemy.getHp()){
                     player.setHp(player.getHp()-currentEnemy.getHp());
-                    //zabijanie enemy i array j cofniety o jeden to tylu
-                    currentEnemy.Die();
-                    enemyTable.remove(i);
-                    i--;
+                    currentEnemy.setHp(0);
+                    System.out.println("die1");
                 }
                 if(player.getHp()<currentEnemy.getHp()){
                     currentEnemy.setHp(currentEnemy.getHp()-player.getHp());
-                    player.Die();
-                    //tutaj trzeba jakos zabic playera i skonczyc gierke
+                    player.setHp(0);
+                    System.out.println("die2");
                 }
                 else{
-                    currentEnemy.Die();
-                    player.Die();
-                    //tutaj trzeba jakos zabic playera i skonczyc gierke
+                    currentEnemy.setHp(0);
+                    player.setHp(0);
+                    System.out.println("die3");
                 }
             }
         }
+
+
 
 
         //ograniczenie dla pocisku
@@ -163,16 +153,30 @@ public class Collider extends BoardController{
                     Math.pow((currentAllyBullet.getPosition()[1]),2))
                     >= this.getBoardRadius()){
                     //zabijanie bulleta i array i cofniety o jeden to tylu
-                    currentAllyBullet.Die();
-                    allybulletTable.remove(i);
-                    i--;
+                    currentAllyBullet.setHp(0);
             }
         }
         ArrayList<Entity> newArrayList = new ArrayList<>();
-        newArrayList.add(player);
-        newArrayList.addAll(allybulletTable);
-        newArrayList.addAll(enemyTable);
-        newArrayList.addAll(enemybulletTable);
+
+        if (player.getHp() > 0){
+            newArrayList.add(player);
+        }
+        for (int i = 0; i < allybulletTable.size(); ++i){
+            if (allybulletTable.get(i).getHp() > 0){
+                newArrayList.add(allybulletTable.get(i));
+            }
+        }
+        for (int i = 0; i < enemyTable.size(); ++i){
+            if (enemyTable.get(i).getHp() > 0){
+                newArrayList.add(enemyTable.get(i));
+            }
+        }
+        for (int i = 0; i < enemybulletTable.size(); ++i){
+            if (enemybulletTable.get(i).getHp() > 0){
+                newArrayList.add(enemybulletTable.get(i));
+            }
+        }
+        System.out.println(enemyTable.size());
         super.setEntityTable(newArrayList);
     }
 }
