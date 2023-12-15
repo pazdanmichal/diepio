@@ -2,28 +2,35 @@ package Entity;
 
 public abstract class Entity {
     private int hp; //domyslnie 1 dla poczatkowej wersji gry
-    private byte radius; //typ zmiennej zalezny od skali osi wspolrzednych (do ustalenia)
+    private float radius; //typ zmiennej zalezny od skali osi wspolrzednych (do ustalenia)
     private float angle; //kat obrotu jako wartosc zmienno-przecinkowa - wieksza dokladnosc
-    private int[] position = new int[2]; //dwie wartosci x i y oznaczajace pozycje
+    private float[] position = new float[2]; //dwie wartosci x i y oznaczajace pozycje
     private int movementSpeed; //poniewaz enemy i bullet ma, a u pleyera domyslne bd 0
 
-    public Entity(int hp, byte radius, float angle, int[] position, int movementSpeed) {
+    public Entity(int hp, float radius, float angle, float[] position, int movementSpeed) {
         this.hp = hp;
         this.radius = radius;
         this.angle = angle;
         this.position = position;
         this.movementSpeed = movementSpeed;
     }
+    public Entity() {
+        this.hp = 0;
+        this.radius = 0;
+        this.angle = 0;
+        this.position = new float [] {0,0};
+        this.movementSpeed = 0;
+    }
 
     public int getHp() {
         return hp;
     }
 
-    public byte getRadius() {
+    public float getRadius() {
         return radius;
     }
 
-    public void setRadius(byte radius) {
+    public void setRadius(float radius) {
         this.radius = radius;
     }
     //mozemy zrobic tak, ze po otrzymaniu damageu enemy bedzie zmniejszal swoj
@@ -37,11 +44,11 @@ public abstract class Entity {
         this.angle = angle;
     }
 
-    public int[] getPosition() {
+    public float[] getPosition() {
         return position;
     }
 
-    public void setPosition(int[] position) {
+    public void setPosition(float[] position) {
         this.position = position;
     }
 

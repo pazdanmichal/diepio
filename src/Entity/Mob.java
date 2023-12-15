@@ -2,15 +2,25 @@ package Entity;
 
 public abstract class Mob extends Entity {
     private boolean canShoot;
-    private int attackFrequency;
+    private float attackFrequency;
     private int damage;
+    private long shootTime = 0;
 
-    public Mob(int hp, byte radius, float angle, int[] position,
-               int movementSpeed, boolean canShoot, int attackFrequency, int damage) {
+    public Mob(int hp, float radius, float angle, float[] position,
+               int movementSpeed, boolean canShoot, float attackFrequency, int damage) {
         super(hp, radius, angle, position, movementSpeed);
         this.canShoot = canShoot;
         this.attackFrequency = attackFrequency;
         this.damage = damage;
+    }
+
+
+
+    public Mob() {
+        super();
+        this.canShoot = false;
+        this.attackFrequency = 0;
+        this.damage = 0;
     }
 
     public boolean isCanShoot() {
@@ -22,11 +32,11 @@ public abstract class Mob extends Entity {
     }
     //bez sensu, raczej nie bedzie potrzeby zmiany tej zmiennej
 
-    public int getAttackFrequency() {
+    public float getAttackFrequency() {
         return attackFrequency;
     }
 
-    public void setAttackFrequency(int attackFrequency) {
+    public void setAttackFrequency(float attackFrequency) {
         this.attackFrequency = attackFrequency;
     }
 
@@ -36,6 +46,14 @@ public abstract class Mob extends Entity {
 
     public void setDamage(int damage) {
         this.damage = damage;
+    }
+
+    public long getShootTime() {
+        return shootTime;
+    }
+
+    public void setShootTime(long shootTime) {
+        this.shootTime = shootTime;
     }
 
     public void SpawnBullet(){
