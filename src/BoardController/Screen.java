@@ -7,6 +7,7 @@ import Entity.Bullet;
 import org.lwjgl.glfw.GLFWVidMode;
 
 import java.util.ArrayList;
+import java.util.Random;
 
 import static org.lwjgl.glfw.Callbacks.glfwFreeCallbacks;
 import static org.lwjgl.glfw.GLFW.*;
@@ -118,8 +119,10 @@ public class Screen extends BoardController{
 
         glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
 
+        Random random = new Random();
 
         Collider entityCollider = new Collider();
+        entityCollider.setEntityTable(this.getEntityTable());
 
         boolean playerFound = true;
 
@@ -127,11 +130,13 @@ public class Screen extends BoardController{
         long startTime = System.currentTimeMillis();
         long frame = 0;
 
+        long spawnedEnemies = 0;
+
         while (!glfwWindowShouldClose(window) && playerFound) {
             frame += 1;
 
-            entityCollider.RenderStep(this.getEntityTable());
-            entityCollider.CheckColisions(this.getEntityTable());
+            entityCollider.RenderStep(entityCollider.getEntityTable());
+            entityCollider.CheckColisions(entityCollider.getEntityTable());
 
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
             glColor3f(1.0f, 1.0f, 1.0f);
@@ -140,7 +145,15 @@ public class Screen extends BoardController{
             ArrayList <Entity> currentEntityTable = entityCollider.getEntityTable();
 
             if (frame%100 == 0){
-                this.addEntity(new Enemy(10, 20, 180, new float[] {450, 0}, 1, false, 0, 0));
+                for (int i = 0; i<(spawnedEnemies)+1; ++i){
+                    float angle = random.nextFloat() * 2 * (float) Math.PI;
+                    float x = 700 * (float) Math.cos(angle);
+                    float y = 700 * (float) Math.sin(angle);
+                    angle = (360*angle)/(2*(float)Math.PI);
+                    angle += 180;
+                    entityCollider.addEntity(new Enemy(1, 20, angle, new float[] {x, y}, 0.5f, false, 0, 0));
+                }
+
             }
 
 
@@ -162,7 +175,7 @@ public class Screen extends BoardController{
                             // Calculate the end point of the line based on length and angle
                             float endX = currentPosition[0] + currentPlayer.getRadius()*currentPlayer.getGunLengthMultiply() * (float) Math.cos(angleRad);
                             float endY = currentPosition[1] + currentPlayer.getRadius()*currentPlayer.getGunLengthMultiply() * (float) Math.sin(angleRad);
-                            this.addEntity(new Bullet(currentPlayer.getDamage(), currentPlayer.getRadius() * currentPlayer.getGunWidthMultiply() * 0.8f, currentPlayer.getAngle(), new float[] {endX, endY}, currentPlayer.getBulletSPeed(), true));
+                            entityCollider.addEntity(new Bullet(currentPlayer.getDamage(), currentPlayer.getRadius() * currentPlayer.getGunWidthMultiply() * 0.8f, currentPlayer.getAngle(), new float[] {endX, endY}, currentPlayer.getBulletSPeed(), true));
                             currentPlayer.setShootTime(elapsedTime);
                         }
                     }

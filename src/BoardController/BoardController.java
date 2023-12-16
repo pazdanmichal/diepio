@@ -38,4 +38,14 @@ public abstract class BoardController {
     public void addEntity(Entity entity) {
         entityTable.add(entity);
     }
+
+    public void clearEntityTable(){
+        ArrayList<Entity> currentEntityTable = new ArrayList<>();
+        for (int i = 0; i<entityTable.size(); ++i){
+            if (entityTable.get(i).getHp() > 0){
+                currentEntityTable.add(entityTable.get(i));
+            }
+        }
+        this.entityTable = currentEntityTable;
+    }
 }

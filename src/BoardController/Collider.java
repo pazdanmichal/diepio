@@ -127,17 +127,15 @@ public class Collider extends BoardController{
                 if(player.getHp()>currentEnemy.getHp()){
                     player.setHp(player.getHp()-currentEnemy.getHp());
                     currentEnemy.setHp(0);
-                    System.out.println("die1");
+                    System.out.println(player.getHp());
                 }
-                if(player.getHp()<currentEnemy.getHp()){
+                else if(player.getHp()<currentEnemy.getHp()){
                     currentEnemy.setHp(currentEnemy.getHp()-player.getHp());
                     player.setHp(0);
-                    System.out.println("die2");
                 }
                 else{
                     currentEnemy.setHp(0);
                     player.setHp(0);
-                    System.out.println("die3");
                 }
             }
         }
@@ -176,7 +174,6 @@ public class Collider extends BoardController{
                 newArrayList.add(enemybulletTable.get(i));
             }
         }
-        System.out.println(enemyTable.size());
         super.setEntityTable(newArrayList);
     }
 }

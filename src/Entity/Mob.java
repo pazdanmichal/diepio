@@ -7,7 +7,7 @@ public abstract class Mob extends Entity {
     private long shootTime = 0;
 
     public Mob(int hp, float radius, float angle, float[] position,
-               int movementSpeed, boolean canShoot, float attackFrequency, int damage) {
+               float movementSpeed, boolean canShoot, float attackFrequency, int damage) {
         super(hp, radius, angle, position, movementSpeed);
         this.canShoot = canShoot;
         this.attackFrequency = attackFrequency;

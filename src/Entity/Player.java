@@ -2,13 +2,13 @@ package Entity;
 
 public class Player extends Mob{
     private byte currentRotation;//-1 -> lewo; 0 -> stoi; 1 -> prawo
-    private int rotationSpeed;
+    private float rotationSpeed;
     private float gunWidthMultiply;
     private float gunLengthMultiply;
     private int bulletSPeed;
 
-    public Player(int hp, float radius, float angle, float[] position, int movementSpeed, boolean canShoot,
-                  float attackFrequency, int damage, byte currentRotation, int rotationSpeed, float gunLengthMultiply, float gunWidthMultiply, int bulletSpeed) {
+    public Player(int hp, float radius, float angle, float[] position, float movementSpeed, boolean canShoot,
+                  float attackFrequency, int damage, byte currentRotation, float rotationSpeed, float gunLengthMultiply, float gunWidthMultiply, int bulletSpeed) {
         super(hp, radius, angle, position, movementSpeed, canShoot, attackFrequency, damage);
         this.currentRotation = currentRotation;
         this.rotationSpeed = rotationSpeed;
@@ -30,12 +30,12 @@ public class Player extends Mob{
         this.currentRotation = currentRotation;
     }
 
-    public int getRotationSpeed() {
+    public float getRotationSpeed() {
         return rotationSpeed;
     }
     //mozliwa zmiana, np. zmiana statystyk w trakcie gry (lvl up)
 
-    public void setRotationSpeed(int rotationSpeed) {
+    public void setRotationSpeed(float rotationSpeed) {
         this.rotationSpeed = rotationSpeed;
     }
 

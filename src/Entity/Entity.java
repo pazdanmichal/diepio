@@ -5,9 +5,9 @@ public abstract class Entity {
     private float radius; //typ zmiennej zalezny od skali osi wspolrzednych (do ustalenia)
     private float angle; //kat obrotu jako wartosc zmienno-przecinkowa - wieksza dokladnosc
     private float[] position = new float[2]; //dwie wartosci x i y oznaczajace pozycje
-    private int movementSpeed; //poniewaz enemy i bullet ma, a u pleyera domyslne bd 0
+    private float movementSpeed; //poniewaz enemy i bullet ma, a u pleyera domyslne bd 0
 
-    public Entity(int hp, float radius, float angle, float[] position, int movementSpeed) {
+    public Entity(int hp, float radius, float angle, float[] position, float movementSpeed) {
         this.hp = hp;
         this.radius = radius;
         this.angle = angle;
@@ -56,11 +56,11 @@ public abstract class Entity {
         this.hp = hp;
     }
 
-    public int getSpeed() {
+    public float getSpeed() {
         return movementSpeed;
     }
 
-    public void setSpeed(int movementSpeed) {
+    public void setSpeed(float movementSpeed) {
         this.movementSpeed = movementSpeed;
     }
 
