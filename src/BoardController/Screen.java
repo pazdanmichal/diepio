@@ -145,7 +145,8 @@ public class Screen extends BoardController{
             ArrayList <Entity> currentEntityTable = entityCollider.getEntityTable();
 
             if (frame%100 == 0){
-                for (int i = 0; i<(spawnedEnemies)+1; ++i){
+                for (int i = 0; i<(spawnedEnemies/30)+1; ++i){
+                    spawnedEnemies += 1;
                     float angle = random.nextFloat() * 2 * (float) Math.PI;
                     float x = 700 * (float) Math.cos(angle);
                     float y = 700 * (float) Math.sin(angle);
