@@ -15,10 +15,15 @@ import static org.lwjgl.opengl.GL.createCapabilities;
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.system.MemoryUtil.NULL;
 
-
 public class Screen extends BoardController{
     private int screenDimensionX;
     private int screenDimensionY;
+    private long spawnedEnemies;
+    private Collider entityCollider;
+    private long window;
+    private boolean playerFound;
+    private long startTime;
+    private long frame;
 
     public Screen(int screenDimensionX, int screenDimensionY){
         this.screenDimensionX = screenDimensionX;
@@ -90,7 +95,121 @@ public class Screen extends BoardController{
         glEnd();
     }
 
+    private Player findPlayer(ArrayList<Entity> currentEntityTable){
+        for (Entity entity : currentEntityTable){
+            if (entity instanceof Player){
+                return (Player) entity;
+            }
+        }
+        return null;
+    }
 
+    private void Shoot(Player currentPlayer, long startTime){
+        long currentTime = System.currentTimeMillis();
+        long elapsedTime = currentTime - startTime;
+        if (elapsedTime > currentPlayer.getShootTime() + currentPlayer.getAttackFrequency()){
+            float[] currentPosition = currentPlayer.getPosition();
+            float rotation = currentPlayer.getAngle();
+
+            double angleRad = Math.toRadians(rotation);
+
+            // Calculate the end point of the line based on length and angle
+            float endX = currentPosition[0] + currentPlayer.getRadius()*currentPlayer.getGunLengthMultiply() * (float) Math.cos(angleRad);
+            float endY = currentPosition[1] + currentPlayer.getRadius()*currentPlayer.getGunLengthMultiply() * (float) Math.sin(angleRad);
+            entityCollider.addEntity(new Bullet(currentPlayer.getDamage(), currentPlayer.getRadius() * currentPlayer.getGunWidthMultiply() * 0.8f, currentPlayer.getAngle(), new float[] {endX, endY}, currentPlayer.getBulletSPeed(), true));
+            currentPlayer.setShootTime(elapsedTime);
+        }
+    }
+
+    private void SpawnEnemy(Random random){
+        spawnedEnemies += 1;
+        float angle = random.nextFloat() * 2 * (float) Math.PI;
+        float x = 700 * (float) Math.cos(angle);
+        float y = 700 * (float) Math.sin(angle);
+        angle = (360*angle)/(2*(float)Math.PI);
+        angle += 180;
+        entityCollider.addEntity(new Enemy(1, 20, angle, new float[] {x, y}, 0.5f, false, 0, 0));
+    }
+
+    private void SpawnWave(int amountOfEnemies){
+        Random random = new Random();
+        for (int i = 0; i<amountOfEnemies; ++i){
+            SpawnEnemy(random);
+        }
+    }
+
+    private void KeyListener(Player currentPlayer){
+        if (glfwGetKey(window, GLFW_KEY_V) == GLFW_PRESS) {
+            // if V is pressed spawn wave
+            SpawnWave(20);
+        }
+
+        // Keyboard listening <- przydalaby sie osobna funkcja
+        if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) {
+            // Spacebar is pressed
+            Shoot(currentPlayer, startTime);
+        }
+
+        if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
+            // D is pressed
+            currentPlayer.setCurrentRotation((byte)1);
+        } else if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
+            // A is pressed
+            currentPlayer.setCurrentRotation((byte)-1);
+        } else if ((glfwGetKey(window, GLFW_KEY_D) == GLFW_RELEASE)&&(glfwGetKey(window, GLFW_KEY_A) == GLFW_RELEASE)) {
+            // nothing is pressed
+            currentPlayer.setCurrentRotation((byte)0);
+        }
+    }
+
+    private void GameLoop(){
+        while (!glfwWindowShouldClose(window) && playerFound) {
+            frame += 1;
+
+            entityCollider.RenderStep(entityCollider.getEntityTable());
+            entityCollider.CheckColisions(entityCollider.getEntityTable());
+
+            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+            glColor3f(1.0f, 1.0f, 1.0f);
+
+
+            ArrayList <Entity> currentEntityTable = entityCollider.getEntityTable();
+            Player currentPlayer = findPlayer(currentEntityTable);
+
+            KeyListener(currentPlayer);
+
+            // Draw bullets and other entities
+            for (int i = 0; i<currentEntityTable.size(); i++){
+                if (currentEntityTable.get(i) instanceof Bullet) {
+                    Bullet currentBullet = (Bullet) currentEntityTable.get(i);
+                    if (currentBullet.isAlly()){
+                        drawCircle(0, 0, 0.6f, currentEntityTable.get(i).getRadius(), currentEntityTable.get(i).getPosition()[0], currentEntityTable.get(i).getPosition()[1]);
+                    } else {
+                        drawCircle(0.6f, 0, 0, currentEntityTable.get(i).getRadius(), currentEntityTable.get(i).getPosition()[0], currentEntityTable.get(i).getPosition()[1]);
+                    }
+                }
+            }
+
+            playerFound = false;
+            for (int i = 0; i<currentEntityTable.size(); i++) {
+
+                if (currentEntityTable.get(i) instanceof Player) {
+                    playerFound = true;
+                    drawLine(0.4f, 0.4f, 0.4f, currentEntityTable.get(i).getPosition()[0], currentEntityTable.get(i).getPosition()[1], currentEntityTable.get(i).getRadius() * ((Player) currentEntityTable.get(i)).getGunLengthMultiply(), currentEntityTable.get(i).getRadius() * ((Player) currentEntityTable.get(i)).getGunWidthMultiply(), currentEntityTable.get(i).getAngle());
+                    drawCircle(0, 0.75f, 1, currentEntityTable.get(i).getRadius(), currentEntityTable.get(i).getPosition()[0], currentEntityTable.get(i).getPosition()[1]);
+
+                } else if (currentEntityTable.get(i) instanceof Enemy) {
+                    drawCircle(1, 0, 0, currentEntityTable.get(i).getRadius(), currentEntityTable.get(i).getPosition()[0], currentEntityTable.get(i).getPosition()[1]);
+                }
+            }
+
+            // Swap the front and back buffers
+            glfwSwapBuffers(window);
+
+            // Poll for and process events
+            glfwPollEvents();
+        }
+    }
     public void RunGame(){
 
         //tutaj inicjalizacja
@@ -100,7 +219,7 @@ public class Screen extends BoardController{
         glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
         glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
 
-        long window = glfwCreateWindow(screenDimensionX,screenDimensionY, "LWJGL Circle Example", NULL, NULL);
+        window = glfwCreateWindow(screenDimensionX,screenDimensionY, "LWJGL Circle Example", NULL, NULL);
 
         if (window == NULL) {
             throw new RuntimeException("Failed to create the GLFW window");
@@ -119,127 +238,18 @@ public class Screen extends BoardController{
 
         glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
 
-        Random random = new Random();
-
-        Collider entityCollider = new Collider();
+        entityCollider = new Collider();
         entityCollider.setEntityTable(this.getEntityTable());
 
-        boolean playerFound = true;
+        playerFound = true;
 
+        startTime = System.currentTimeMillis();
+        frame = 0;
 
-        long startTime = System.currentTimeMillis();
-        long frame = 0;
+        spawnedEnemies = 0;
 
-        long spawnedEnemies = 0;
-
-        while (!glfwWindowShouldClose(window) && playerFound) {
-            frame += 1;
-
-            entityCollider.RenderStep(entityCollider.getEntityTable());
-            entityCollider.CheckColisions(entityCollider.getEntityTable());
-
-            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-            glColor3f(1.0f, 1.0f, 1.0f);
-
-
-            ArrayList <Entity> currentEntityTable = entityCollider.getEntityTable();
-
-            if (frame%100 == 0){
-                for (int i = 0; i<(spawnedEnemies/30)+1; ++i){
-                    spawnedEnemies += 1;
-                    System.out.println(spawnedEnemies);
-                    float angle = random.nextFloat() * 2 * (float) Math.PI;
-                    float x = 700 * (float) Math.cos(angle);
-                    float y = 700 * (float) Math.sin(angle);
-                    angle = (360*angle)/(2*(float)Math.PI);
-                    angle += 180;
-                    entityCollider.addEntity(new Enemy(1, 20, angle, new float[] {x, y}, 0.5f, false, 0, 0));
-                }
-            }
-
-
-
-            if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) {
-                // Spacebar is pressed
-                for (int i = 0; i<currentEntityTable.size(); i++){
-                    if (currentEntityTable.get(i) instanceof Player){
-                        Player currentPlayer = (Player) currentEntityTable.get(i);
-
-                        long currentTime = System.currentTimeMillis();
-                        long elapsedTime = currentTime - startTime;
-                        if (elapsedTime > currentPlayer.getShootTime() + currentPlayer.getAttackFrequency()){
-                            float[] currentPosition = currentEntityTable.get(i).getPosition();
-                            float rotation = currentEntityTable.get(i).getAngle();
-
-                            double angleRad = Math.toRadians(rotation);
-
-                            // Calculate the end point of the line based on length and angle
-                            float endX = currentPosition[0] + currentPlayer.getRadius()*currentPlayer.getGunLengthMultiply() * (float) Math.cos(angleRad);
-                            float endY = currentPosition[1] + currentPlayer.getRadius()*currentPlayer.getGunLengthMultiply() * (float) Math.sin(angleRad);
-                            entityCollider.addEntity(new Bullet(currentPlayer.getDamage(), currentPlayer.getRadius() * currentPlayer.getGunWidthMultiply() * 0.8f, currentPlayer.getAngle(), new float[] {endX, endY}, currentPlayer.getBulletSPeed(), true));
-                            currentPlayer.setShootTime(elapsedTime);
-                        }
-                    }
-                }
-            }
-
-            if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
-                // D is pressed
-                for (int i = 0; i<currentEntityTable.size(); i++){
-                    if (currentEntityTable.get(i) instanceof Player){
-                        Player currentPlayer = (Player) currentEntityTable.get(i);
-                        currentPlayer.setCurrentRotation((byte)1);
-                    }
-                }
-            } else if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
-                // A is pressed
-                for (int i = 0; i<currentEntityTable.size(); i++){
-                    if (currentEntityTable.get(i) instanceof Player){
-                        Player currentPlayer = (Player) currentEntityTable.get(i);
-                        currentPlayer.setCurrentRotation((byte)-1);
-                    }
-                }
-            } else if ((glfwGetKey(window, GLFW_KEY_D) == GLFW_RELEASE)&&(glfwGetKey(window, GLFW_KEY_A) == GLFW_RELEASE)) {
-                for (int i = 0; i<currentEntityTable.size(); i++){
-                    if (currentEntityTable.get(i) instanceof Player){
-                        Player currentPlayer = (Player) currentEntityTable.get(i);
-                        currentPlayer.setCurrentRotation((byte)0);
-                    }
-                }
-            }
-
-            for (int i = 0; i<currentEntityTable.size(); i++){
-                if (currentEntityTable.get(i) instanceof Bullet) {
-                    Bullet currentBullet = (Bullet) currentEntityTable.get(i);
-                    if (currentBullet.isAlly()){
-                        drawCircle(0, 0, 0.6f, currentEntityTable.get(i).getRadius(), currentEntityTable.get(i).getPosition()[0], currentEntityTable.get(i).getPosition()[1]);
-                    } else {
-                        drawCircle(0.6f, 0, 0, currentEntityTable.get(i).getRadius(), currentEntityTable.get(i).getPosition()[0], currentEntityTable.get(i).getPosition()[1]);
-                    }
-                }
-            }
-
-            playerFound = false;
-            for (int i = 0; i<currentEntityTable.size(); i++){
-
-                if (currentEntityTable.get(i) instanceof Player){
-                    playerFound = true;
-                    drawLine(0.4f, 0.4f, 0.4f, currentEntityTable.get(i).getPosition()[0], currentEntityTable.get(i).getPosition()[1], currentEntityTable.get(i).getRadius()*((Player) currentEntityTable.get(i)).getGunLengthMultiply(), currentEntityTable.get(i).getRadius()*((Player) currentEntityTable.get(i)).getGunWidthMultiply(), currentEntityTable.get(i).getAngle());
-                    drawCircle(0, 0.75f, 1, currentEntityTable.get(i).getRadius(), currentEntityTable.get(i).getPosition()[0], currentEntityTable.get(i).getPosition()[1]);
-
-                } else if (currentEntityTable.get(i) instanceof Enemy) {
-                    drawCircle(1, 0, 0, currentEntityTable.get(i).getRadius(), currentEntityTable.get(i).getPosition()[0], currentEntityTable.get(i).getPosition()[1]);
-                }
-            }
-
-
-
-            // Swap the front and back buffers
-            glfwSwapBuffers(window);
-
-            // Poll for and process events
-            glfwPollEvents();
-        }
+        // Our game
+        GameLoop();
 
         glfwFreeCallbacks(window);
         glfwDestroyWindow(window);
