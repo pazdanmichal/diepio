@@ -24,6 +24,7 @@ public class Screen extends BoardController{
     private boolean playerFound;
     private long startTime;
     private long frame;
+    private Random random;
 
     public Screen(int screenDimensionX, int screenDimensionY){
         this.screenDimensionX = screenDimensionX;
@@ -121,7 +122,7 @@ public class Screen extends BoardController{
         }
     }
 
-    private void SpawnEnemy(Random random){
+    private void SpawnEnemy(){
         spawnedEnemies += 1;
         float angle = random.nextFloat() * 2 * (float) Math.PI;
         float x = 700 * (float) Math.cos(angle);
@@ -131,18 +132,17 @@ public class Screen extends BoardController{
         entityCollider.addEntity(new Enemy(1, 20, angle, new float[] {x, y}, 0.5f, false, 0, 0));
     }
 
-    private void SpawnWave(int amountOfEnemies){
-        Random random = new Random();
+    private void SpawnWave(long amountOfEnemies){
         for (int i = 0; i<amountOfEnemies; ++i){
-            SpawnEnemy(random);
+            SpawnEnemy();
         }
     }
 
     private void KeyListener(Player currentPlayer){
-        if (glfwGetKey(window, GLFW_KEY_V) == GLFW_PRESS) {
+        /*if (glfwGetKey(window, GLFW_KEY_V) == GLFW_PRESS) {
             // if V is pressed spawn wave
             SpawnWave(20);
-        }
+        }*/
 
         // Keyboard listening <- przydalaby sie osobna funkcja
         if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) {
@@ -176,6 +176,11 @@ public class Screen extends BoardController{
             ArrayList <Entity> currentEntityTable = entityCollider.getEntityTable();
             Player currentPlayer = findPlayer(currentEntityTable);
 
+            // Dosyc fajne skalowanie fali
+            random = new Random();
+            if(frame%300 == 0){
+                SpawnWave((long)random.nextInt(1+(int)(frame/1000), 3+(int)(frame/1000)));
+            }
             KeyListener(currentPlayer);
 
             // Draw bullets and other entities
