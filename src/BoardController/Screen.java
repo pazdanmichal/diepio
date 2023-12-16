@@ -147,6 +147,7 @@ public class Screen extends BoardController{
             if (frame%100 == 0){
                 for (int i = 0; i<(spawnedEnemies/30)+1; ++i){
                     spawnedEnemies += 1;
+                    System.out.println(spawnedEnemies);
                     float angle = random.nextFloat() * 2 * (float) Math.PI;
                     float x = 700 * (float) Math.cos(angle);
                     float y = 700 * (float) Math.sin(angle);
@@ -154,7 +155,6 @@ public class Screen extends BoardController{
                     angle += 180;
                     entityCollider.addEntity(new Enemy(1, 20, angle, new float[] {x, y}, 0.5f, false, 0, 0));
                 }
-
             }
 
 
