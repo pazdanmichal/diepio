@@ -1,5 +1,7 @@
 package BoardController;
 
+import Algorithms.Algorithm;
+import Algorithms.IdiotBot;
 import Entity.Entity;
 import Entity.Player;
 import Entity.Enemy;
@@ -7,6 +9,7 @@ import Entity.Bullet;
 import org.lwjgl.glfw.GLFWVidMode;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 import static org.lwjgl.glfw.Callbacks.glfwFreeCallbacks;
@@ -25,6 +28,8 @@ public class Screen extends BoardController{
     private long startTime;
     private long frame;
     private Random random;
+    private Algorithm botAlgorithm;
+    private boolean _isSpawnedFirstWave;
 
     public Screen(int screenDimensionX, int screenDimensionY){
         this.screenDimensionX = screenDimensionX;
@@ -105,7 +110,7 @@ public class Screen extends BoardController{
         return null;
     }
 
-    private void Shoot(Player currentPlayer, long startTime){
+    private void Shoot(Player currentPlayer){
         long currentTime = System.currentTimeMillis();
         long elapsedTime = currentTime - startTime;
         if (elapsedTime > currentPlayer.getShootTime() + currentPlayer.getAttackFrequency()){
@@ -147,7 +152,7 @@ public class Screen extends BoardController{
         // Keyboard listening <- przydalaby sie osobna funkcja
         if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) {
             // Spacebar is pressed
-            Shoot(currentPlayer, startTime);
+            Shoot(currentPlayer);
         }
 
         if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
@@ -162,6 +167,12 @@ public class Screen extends BoardController{
         }
     }
 
+    private void AutonomicBotMove(Algorithm algorithm, Player currentPlayer){
+        long currentTime = System.currentTimeMillis();
+        currentPlayer.setCurrentRotation(algorithm.Move(currentTime));
+        if(algorithm.TryShoot(currentTime)) { Shoot(currentPlayer); }
+    }
+
     private void GameLoop(){
         while (!glfwWindowShouldClose(window) && playerFound) {
             frame += 1;
@@ -172,16 +183,30 @@ public class Screen extends BoardController{
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
             glColor3f(1.0f, 1.0f, 1.0f);
 
-
             ArrayList <Entity> currentEntityTable = entityCollider.getEntityTable();
             Player currentPlayer = findPlayer(currentEntityTable);
 
             // Dosyc fajne skalowanie fali
-            random = new Random();
-            if(frame%300 == 0){
+            /*random = new Random();
+            if(frame%100 == 0){
                 SpawnWave((long)random.nextInt(1+(int)(frame/1000), 3+(int)(frame/1000)));
             }
-            KeyListener(currentPlayer);
+            KeyListener(currentPlayer);*/
+
+            // Usage for bot algorithm
+            if(!_isSpawnedFirstWave){
+                _isSpawnedFirstWave = true;
+                SpawnWave(20);
+                List<Enemy> enemies = new ArrayList<Enemy>();
+                for(Entity entity : currentEntityTable){
+                    if (entity instanceof Enemy) enemies.add((Enemy)entity);
+                }
+
+                botAlgorithm.Init(enemies, currentPlayer, System.currentTimeMillis());
+                botAlgorithm.Run();
+            }
+
+            AutonomicBotMove(botAlgorithm, currentPlayer);
 
             // Draw bullets and other entities
             for (int i = 0; i<currentEntityTable.size(); i++){
@@ -207,6 +232,7 @@ public class Screen extends BoardController{
                     drawCircle(1, 0, 0, currentEntityTable.get(i).getRadius(), currentEntityTable.get(i).getPosition()[0], currentEntityTable.get(i).getPosition()[1]);
                 }
             }
+            System.out.println(frame);
 
             // Swap the front and back buffers
             glfwSwapBuffers(window);
@@ -252,6 +278,12 @@ public class Screen extends BoardController{
         frame = 0;
 
         spawnedEnemies = 0;
+
+        _isSpawnedFirstWave = false;
+        random = new Random();
+
+        // Algorithm initialization
+        botAlgorithm = new IdiotBot();
 
         // Our game
         GameLoop();
