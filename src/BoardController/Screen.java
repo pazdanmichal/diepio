@@ -24,12 +24,13 @@ public class Screen extends BoardController{
     private long spawnedEnemies;
     private Collider entityCollider;
     private long window;
-    private boolean playerFound;
     private long startTime;
     private long frame;
     private Random random;
-    private Algorithm botAlgorithm;
+    private Algorithm playerAlgorithm;
     private boolean _isSpawnedFirstWave;
+    private Player currentPlayer;
+    private ArrayList <Entity> currentEntityTable;
 
     public Screen(int screenDimensionX, int screenDimensionY){
         this.screenDimensionX = screenDimensionX;
@@ -101,6 +102,26 @@ public class Screen extends BoardController{
         glEnd();
     }
 
+    private void DrawEntities(){
+        for (Entity entity : currentEntityTable){
+            if (entity instanceof Bullet) {
+                Bullet currentBullet = (Bullet) entity;
+                if (currentBullet.isAlly()){
+                    drawCircle(0, 0, 0.6f, currentBullet.getRadius(), currentBullet.getPosition()[0], currentBullet.getPosition()[1]);
+                } else {
+                    drawCircle(0.6f, 0, 0, currentBullet.getRadius(), currentBullet.getPosition()[0], currentBullet.getPosition()[1]);
+                }
+            }
+            else if (entity instanceof Player) {
+                drawLine(0.4f, 0.4f, 0.4f, entity.getPosition()[0], entity.getPosition()[1], entity.getRadius() * ((Player) entity).getGunLengthMultiply(), entity.getRadius() * ((Player) entity).getGunWidthMultiply(), entity.getAngle());
+                drawCircle(0, 0.75f, 1, entity.getRadius(), entity.getPosition()[0], entity.getPosition()[1]);
+            }
+            else if (entity instanceof Enemy) {
+                drawCircle(1, 0, 0, entity.getRadius(), entity.getPosition()[0], entity.getPosition()[1]);
+            }
+        }
+    }
+
     private Player findPlayer(ArrayList<Entity> currentEntityTable){
         for (Entity entity : currentEntityTable){
             if (entity instanceof Player){
@@ -110,7 +131,7 @@ public class Screen extends BoardController{
         return null;
     }
 
-    private void Shoot(Player currentPlayer){
+    private boolean Shoot(Player currentPlayer){
         long currentTime = System.currentTimeMillis();
         long elapsedTime = currentTime - startTime;
         if (elapsedTime > currentPlayer.getShootTime() + currentPlayer.getAttackFrequency()){
@@ -124,7 +145,9 @@ public class Screen extends BoardController{
             float endY = currentPosition[1] + currentPlayer.getRadius()*currentPlayer.getGunLengthMultiply() * (float) Math.sin(angleRad);
             entityCollider.addEntity(new Bullet(currentPlayer.getDamage(), currentPlayer.getRadius() * currentPlayer.getGunWidthMultiply() * 0.8f, currentPlayer.getAngle(), new float[] {endX, endY}, currentPlayer.getBulletSPeed(), true));
             currentPlayer.setShootTime(elapsedTime);
+            return true;
         }
+        return false;
     }
 
     private void SpawnEnemy(){
@@ -144,12 +167,7 @@ public class Screen extends BoardController{
     }
 
     private void KeyListener(Player currentPlayer){
-        /*if (glfwGetKey(window, GLFW_KEY_V) == GLFW_PRESS) {
-            // if V is pressed spawn wave
-            SpawnWave(20);
-        }*/
 
-        // Keyboard listening <- przydalaby sie osobna funkcja
         if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) {
             // Spacebar is pressed
             Shoot(currentPlayer);
@@ -165,16 +183,25 @@ public class Screen extends BoardController{
             // nothing is pressed
             currentPlayer.setCurrentRotation((byte)0);
         }
+
     }
 
-    private void AutonomicBotMove(Algorithm algorithm, Player currentPlayer){
+    private void AutonomicBotMove(){
         long currentTime = System.currentTimeMillis();
-        currentPlayer.setCurrentRotation(algorithm.Move(currentTime));
-        if(algorithm.TryShoot(currentTime)) { Shoot(currentPlayer); }
+        currentPlayer.setCurrentRotation(playerAlgorithm.Move(currentTime));
+        boolean _isShooted = false;
+        if(playerAlgorithm.TryShoot(currentTime)) { _isShooted = Shoot(currentPlayer); }
+        List<Enemy> enemies = new ArrayList<Enemy>();
+        for(Entity entity : currentEntityTable){
+            if(entity instanceof Enemy){
+                enemies.add((Enemy)entity);
+            }
+        }
+        playerAlgorithm.FetchCurrentFrameInfo(currentTime, _isShooted, enemies, currentPlayer);
     }
 
     private void GameLoop(){
-        while (!glfwWindowShouldClose(window) && playerFound) {
+        while (!glfwWindowShouldClose(window) && currentPlayer != null) {
             frame += 1;
 
             entityCollider.RenderStep(entityCollider.getEntityTable());
@@ -183,56 +210,35 @@ public class Screen extends BoardController{
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
             glColor3f(1.0f, 1.0f, 1.0f);
 
-            ArrayList <Entity> currentEntityTable = entityCollider.getEntityTable();
-            Player currentPlayer = findPlayer(currentEntityTable);
+            currentEntityTable = entityCollider.getEntityTable();
+            currentPlayer = findPlayer(currentEntityTable);
+            if(currentPlayer == null) { return; }
 
-            // Dosyc fajne skalowanie fali
-            /*random = new Random();
-            if(frame%100 == 0){
-                SpawnWave((long)random.nextInt(1+(int)(frame/1000), 3+(int)(frame/1000)));
-            }
-            KeyListener(currentPlayer);*/
+            // Tymczasowe ify dopoki nie powstanie WaveHandler
 
-            // Usage for bot algorithm
-            if(!_isSpawnedFirstWave){
-                _isSpawnedFirstWave = true;
-                SpawnWave(20);
-                List<Enemy> enemies = new ArrayList<Enemy>();
-                for(Entity entity : currentEntityTable){
-                    if (entity instanceof Enemy) enemies.add((Enemy)entity);
+            if(playerAlgorithm == null) {
+                // Dosyc fajne skalowanie fali
+                random = new Random();
+                if (frame % 100 == 0) {
+                    SpawnWave((long) random.nextInt(1 + (int) (frame / 1000), 3 + (int) (frame / 1000)));
                 }
-
-                botAlgorithm.Init(enemies, currentPlayer, System.currentTimeMillis());
-                botAlgorithm.Run();
+                KeyListener(currentPlayer);
             }
-
-            AutonomicBotMove(botAlgorithm, currentPlayer);
-
-            // Draw bullets and other entities
-            for (int i = 0; i<currentEntityTable.size(); i++){
-                if (currentEntityTable.get(i) instanceof Bullet) {
-                    Bullet currentBullet = (Bullet) currentEntityTable.get(i);
-                    if (currentBullet.isAlly()){
-                        drawCircle(0, 0, 0.6f, currentEntityTable.get(i).getRadius(), currentEntityTable.get(i).getPosition()[0], currentEntityTable.get(i).getPosition()[1]);
-                    } else {
-                        drawCircle(0.6f, 0, 0, currentEntityTable.get(i).getRadius(), currentEntityTable.get(i).getPosition()[0], currentEntityTable.get(i).getPosition()[1]);
+            else {
+                if (!_isSpawnedFirstWave) {
+                    _isSpawnedFirstWave = true;
+                    SpawnWave(20);
+                    List<Enemy> enemies = new ArrayList<Enemy>();
+                    for (Entity entity : currentEntityTable) {
+                        if (entity instanceof Enemy) enemies.add((Enemy) entity);
                     }
+
+                    playerAlgorithm.Init(enemies, currentPlayer, System.currentTimeMillis());
                 }
+                AutonomicBotMove();
             }
 
-            playerFound = false;
-            for (int i = 0; i<currentEntityTable.size(); i++) {
-
-                if (currentEntityTable.get(i) instanceof Player) {
-                    playerFound = true;
-                    drawLine(0.4f, 0.4f, 0.4f, currentEntityTable.get(i).getPosition()[0], currentEntityTable.get(i).getPosition()[1], currentEntityTable.get(i).getRadius() * ((Player) currentEntityTable.get(i)).getGunLengthMultiply(), currentEntityTable.get(i).getRadius() * ((Player) currentEntityTable.get(i)).getGunWidthMultiply(), currentEntityTable.get(i).getAngle());
-                    drawCircle(0, 0.75f, 1, currentEntityTable.get(i).getRadius(), currentEntityTable.get(i).getPosition()[0], currentEntityTable.get(i).getPosition()[1]);
-
-                } else if (currentEntityTable.get(i) instanceof Enemy) {
-                    drawCircle(1, 0, 0, currentEntityTable.get(i).getRadius(), currentEntityTable.get(i).getPosition()[0], currentEntityTable.get(i).getPosition()[1]);
-                }
-            }
-            System.out.println(frame);
+            DrawEntities();
 
             // Swap the front and back buffers
             glfwSwapBuffers(window);
@@ -241,9 +247,8 @@ public class Screen extends BoardController{
             glfwPollEvents();
         }
     }
-    public void RunGame(){
 
-        //tutaj inicjalizacja
+    private void InitialScreenSettings(){
         if (!glfwInit()) {
             throw new IllegalStateException("Unable to initialize GLFW");
         }
@@ -268,11 +273,23 @@ public class Screen extends BoardController{
         glOrtho(0, screenDimensionX, screenDimensionY, 0, -1, 1);
 
         glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+    }
+
+    private void DestroyWindowAndExit(){
+        glfwFreeCallbacks(window);
+        glfwDestroyWindow(window);
+        glfwTerminate();
+    }
+    public void RunGame(Algorithm _playerAlgorithm){
+
+        playerAlgorithm = _playerAlgorithm;
+
+        InitialScreenSettings();
 
         entityCollider = new Collider();
         entityCollider.setEntityTable(this.getEntityTable());
 
-        playerFound = true;
+        currentPlayer = findPlayer(entityCollider.getEntityTable());
 
         startTime = System.currentTimeMillis();
         frame = 0;
@@ -282,14 +299,10 @@ public class Screen extends BoardController{
         _isSpawnedFirstWave = false;
         random = new Random();
 
-        // Algorithm initialization
-        botAlgorithm = new IdiotBot();
-
         // Our game
         GameLoop();
 
-        glfwFreeCallbacks(window);
-        glfwDestroyWindow(window);
-        glfwTerminate();
+        DestroyWindowAndExit();
+
     }
 }

@@ -14,11 +14,6 @@ public class IdiotBot implements Algorithm{
         this.startTime = startTime;
     }
 
-    @Override
-    public void Run() {
-        // Preprocessing
-    }
-
     private long GetTimeFromStart(long _time){
         return _time - startTime;
     }
@@ -33,5 +28,10 @@ public class IdiotBot implements Algorithm{
     public boolean TryShoot(long _time) {
         // Strzelaj zawsze kiedy mozliwe
         return true;
+    }
+
+    @Override
+    public void FetchCurrentFrameInfo(long _time, boolean isShooted, List<Enemy> enemies, Player player) {
+        if(isShooted) { System.out.println("Czas: " + (double)GetTimeFromStart(_time)/1000 + ", Strzelono!"); }
     }
 }

@@ -1,3 +1,5 @@
+import Algorithms.Algorithm;
+import Algorithms.IdiotBot;
 import BoardController.*;
 import Entity.*;
 import java.util.ArrayList;
@@ -12,6 +14,7 @@ public class Main {
 
         currentScreen.setEntityTable(currentEntityTable);
 
-        currentScreen.RunGame();
+        Algorithm playerAlgorithm = null; //new IdiotBot();
+        currentScreen.RunGame(playerAlgorithm);
     }
 }
