@@ -2,179 +2,108 @@ package BoardController;
 import Entity.*;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class Collider extends BoardController{
-
     public Collider(){};
+    public void RotatePlayer(Entity entity){
+        Player player = (Player) entity;
+        if (player.getCurrentRotation() == (byte) -1) {
+            player.setAngle(player.getAngle() - player.getRotationSpeed());
+        } else if (player.getCurrentRotation() == (byte) 1) {
+            player.setAngle(player.getAngle() + player.getRotationSpeed());
+        }
+    }
+    public void MoveEntity(Entity entity){
+
+        float rad = (float) (360/(2*Math.PI));
+
+        float XOffset = (float) (entity.getSpeed() * Math.cos((entity.getAngle())/rad)),
+        XPosition = entity.getPosition()[0] + XOffset;
+
+        float YOffset = (float) (entity.getSpeed() * Math.sin((entity.getAngle())/rad)),
+        YPosition = entity.getPosition()[1] + YOffset;
+
+        float [] finalPos = new float[] {XPosition, YPosition};
+        entity.setPosition(finalPos);
+    }
 
     public void RenderStep(ArrayList<Entity> entityTable){
+        for (Entity entity : entityTable) {
 
-        for (int i = 0; i< entityTable.size(); i++){
-            //System.out.println("cza");
-            //System.out.println("cza");
-            //jesli obiekt ma klase player to go oborc
-            if(entityTable.get(i) instanceof Player){
-                Player currentPlayer = (Player)entityTable.get(i);
-                if(currentPlayer.getCurrentRotation() == (byte) -1){
-                    currentPlayer.setAngle(currentPlayer.getAngle() - currentPlayer.getRotationSpeed());
-                } else if (currentPlayer.getCurrentRotation() == (byte) 1) {
-                    currentPlayer.setAngle(currentPlayer.getAngle() + currentPlayer.getRotationSpeed());
-                }
-            }
-            // jesli obiekt ma klase bullet to przesun
-            if(entityTable.get(i) instanceof Bullet){
-                Bullet currentBullet = (Bullet) entityTable.get(i);
-
-                float speedX = (float) (currentBullet.getSpeed() * Math.cos(
-                        (currentBullet.getAngle())/(360/(2*Math.PI))
-                ));
-                float speedY = (float) (currentBullet.getSpeed() * Math.sin(
-                        (currentBullet.getAngle())/(360/(2*Math.PI))
-                ));
-
-                float finalPosX = currentBullet.getPosition()[0] + speedX;
-                float finalPosY = currentBullet.getPosition()[1] + speedY;
-                float [] finalPos = new float[2];
-                finalPos[0] = finalPosX;
-                finalPos[1] = finalPosY;
-                currentBullet.setPosition(finalPos);
+            // Jeśli obiekt jest klasą Player to go obróć
+            if (entity instanceof Player) {
+                RotatePlayer(entity);
             }
 
-            // jesli obiekt ma klase enemy to przesun
-            if (entityTable.get(i) instanceof Enemy){
-                Enemy currentEnemy = (Enemy) entityTable.get(i);
-
-                float speedX = (float) (currentEnemy.getSpeed() * Math.cos(
-                        (currentEnemy.getAngle())/(360/(2*Math.PI))
-                ));
-                float speedY = (float) (currentEnemy.getSpeed() * Math.sin(
-                        (currentEnemy.getAngle())/(360/(2*Math.PI))
-                ));
-
-                float finalPosX = currentEnemy.getPosition()[0] + speedX;
-                float finalPosY = currentEnemy.getPosition()[1] + speedY;
-                float [] finalPos = new float[2];
-                finalPos[0] = finalPosX;
-                finalPos[1] = finalPosY;
-                currentEnemy.setPosition(finalPos);
+            // Jeśli obiekt jest klasą Bullet albo Enemy to go przesuń
+            if ((entity instanceof Bullet) || (entity instanceof Enemy)) {
+                MoveEntity(entity);
             }
         }
         super.setEntityTable(entityTable);
-
     }
+
+    public ArrayList<ArrayList<Entity>> ObjectCollision(ArrayList<Entity> objectArray1, ArrayList<Entity> objectArray2) {
+        for (Entity object1: objectArray1) {
+            for (Entity object2: objectArray2) {
+                float[] pos1 = object1.getPosition(), pos2 = object2.getPosition();
+                float radius1 = object1.getRadius(), radius2 = object2.getRadius();
+                boolean collisionOccurs = Math.sqrt(Math.pow((pos1[0]-pos2[0]),2) + Math.pow((pos1[1]-pos2[1]),2))
+                        <= radius1 + radius2;
+
+                if (collisionOccurs) {
+                    int minHp = Math.min(object1.getHp(), object2.getHp());
+                    object1.setHp(object1.getHp() - minHp);
+                    object2.setHp(object2.getHp() - minHp);
+                }
+            }
+        }
+        return new ArrayList<> (Arrays.asList(objectArray1, objectArray2));
+    }
+
     public void CheckColisions(ArrayList<Entity> entityTable){
-        ArrayList<Bullet> allybulletTable = new ArrayList<Bullet>();
-        ArrayList<Bullet> enemybulletTable = new ArrayList<Bullet>();
-        ArrayList<Enemy> enemyTable = new ArrayList<Enemy>();
-        Player player = new Player();
+        ArrayList<Entity> allyBulletTable = new ArrayList<>(), enemyBulletTable = new ArrayList<>(),
+                enemyTable = new ArrayList<>(), playerTable = new ArrayList<>();
 
-
-        for (int i = 0; i< entityTable.size(); i++) {
-            if (entityTable.get(i) instanceof Bullet){
-                Bullet currentBullet = (Bullet) entityTable.get(i);
-                    if(currentBullet.isAlly()){
-                        allybulletTable.add(currentBullet);
-                    }
-                    else{
-                        enemybulletTable.add(currentBullet);
-                    }
+        for (Entity entity : entityTable) {
+            if (entity instanceof Bullet) {
+                Bullet currentBullet = (Bullet) entity;
+                if (currentBullet.isAlly()) {
+                    allyBulletTable.add(currentBullet);
+                } else {
+                    enemyBulletTable.add(currentBullet);
                 }
-                if(entityTable.get(i) instanceof Enemy){
-                    enemyTable.add((Enemy)entityTable.get(i));
-                }
-
-                if(entityTable.get(i) instanceof Player){
-                    player = (Player) entityTable.get(i);
-                }
+            }
+            if (entity instanceof Enemy)    { enemyTable.add((Enemy) entity);   }
+            if (entity instanceof Player)   { playerTable.add(entity);          }
         }
 
-        //kolizja allyBullet/enemy
-        for (int i = 0; i< allybulletTable.size(); i++){
-            for (int j = 0; j < enemyTable.size(); j++) {
-                Bullet currentBullet = (Bullet) allybulletTable.get(i);
-                Enemy currentEnemy = (Enemy) enemyTable.get(j);
-                if(Math.sqrt(Math.pow((currentEnemy.getPosition()[0]-currentBullet.getPosition()[0]),2)+
-                        Math.pow((currentEnemy.getPosition()[1]-currentBullet.getPosition()[1]),2))
-                        <=currentEnemy.getRadius()+currentBullet.getRadius()){
-                            if(currentBullet.getHp()>currentEnemy.getHp()){
-                                currentBullet.setHp(currentBullet.getHp()-currentEnemy.getHp());
-                                //zabijanie enemy i array j cofniety o jeden to tylu
-                                currentEnemy.setHp(0);
-                            }
-                            else if(currentBullet.getHp()<currentEnemy.getHp()){
-                                 currentEnemy.setHp(currentEnemy.getHp()-currentBullet.getHp());
-                                 //zabijanie bulleta i array i cofniety o jeden to tylu
-                                 currentBullet.setHp(0);
-                            }
-                            else{
-                                //zabijanie bulleta i array i cofniety o jeden to tylu
-                                //zabijanie enemy i array j cofniety o jeden to tylu
-                                currentEnemy.setHp(0);
-                                currentBullet.setHp(0);
-                            }
-                }
+        ArrayList<ArrayList<Entity>> x = ObjectCollision(allyBulletTable, enemyTable);
+        allyBulletTable = x.get(0); enemyTable = x.get(1);
+
+        ArrayList<ArrayList<Entity>> y = ObjectCollision(enemyTable, playerTable);
+        enemyTable = y.get(0); playerTable = y.get(1);
+
+        // Tworzenie granic lotu poscisków
+        for (Entity entity : allyBulletTable) {
+            Bullet bullet = (Bullet) entity;
+
+            float bulletPosX = bullet.getPosition()[0], bulletPosY = bullet.getPosition()[1];
+            boolean hitBoundary = Math.sqrt(Math.pow(bulletPosX, 2) + Math.pow(bulletPosY, 2)) >= this.getBoardRadius();
+            if (hitBoundary) {
+                bullet.setHp(0);
             }
         }
 
-
-
-        //kolizja enemy/player
-        for (int i = 0; i< enemyTable.size(); i++){
-            Enemy currentEnemy = (Enemy) enemyTable.get(i);
-            if(Math.sqrt(Math.pow((currentEnemy.getPosition()[0]-player.getPosition()[0]),2)+
-                    Math.pow((currentEnemy.getPosition()[1]-player.getPosition()[1]),2))
-                    <=currentEnemy.getRadius()+player.getRadius()){
-                if(player.getHp()>currentEnemy.getHp()){
-                    player.setHp(player.getHp()-currentEnemy.getHp());
-                    currentEnemy.setHp(0);
-                    System.out.println(player.getHp());
-                }
-                else if(player.getHp()<currentEnemy.getHp()){
-                    currentEnemy.setHp(currentEnemy.getHp()-player.getHp());
-                    player.setHp(0);
-                }
-                else{
-                    currentEnemy.setHp(0);
-                    player.setHp(0);
-                }
+        ArrayList<Entity> newEntityTable = new ArrayList<>();
+        for (Entity entity: entityTable) {
+            if (entity.getHp() > 0) {
+                newEntityTable.add(entity);
             }
         }
 
+        super.setEntityTable(newEntityTable);
 
-
-
-        //ograniczenie dla pocisku
-        for (int i = 0; i < allybulletTable.size(); i++) {
-            Bullet currentAllyBullet = (Bullet) allybulletTable.get(i);
-
-            if(Math.sqrt(Math.pow((currentAllyBullet.getPosition()[0]),2)+
-                    Math.pow((currentAllyBullet.getPosition()[1]),2))
-                    >= this.getBoardRadius()){
-                    //zabijanie bulleta i array i cofniety o jeden to tylu
-                    currentAllyBullet.setHp(0);
-            }
-        }
-        ArrayList<Entity> newArrayList = new ArrayList<>();
-
-        if (player.getHp() > 0){
-            newArrayList.add(player);
-        }
-        for (int i = 0; i < allybulletTable.size(); ++i){
-            if (allybulletTable.get(i).getHp() > 0){
-                newArrayList.add(allybulletTable.get(i));
-            }
-        }
-        for (int i = 0; i < enemyTable.size(); ++i){
-            if (enemyTable.get(i).getHp() > 0){
-                newArrayList.add(enemyTable.get(i));
-            }
-        }
-        for (int i = 0; i < enemybulletTable.size(); ++i){
-            if (enemybulletTable.get(i).getHp() > 0){
-                newArrayList.add(enemybulletTable.get(i));
-            }
-        }
-        super.setEntityTable(newArrayList);
     }
 }
-//titties

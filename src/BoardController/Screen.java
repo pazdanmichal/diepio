@@ -1,5 +1,4 @@
 package BoardController;
-
 import Algorithms.Algorithm;
 import Algorithms.IdiotBot;
 import Entity.Entity;
@@ -129,6 +128,7 @@ public class Screen extends BoardController{
             }
         }
         return null;
+        //wyjatek -> gdy nie znajdzie gracza wyswietla game over na konsoli czy cos
     }
 
     private boolean Shoot(Player currentPlayer){
@@ -148,6 +148,7 @@ public class Screen extends BoardController{
             return true;
         }
         return false;
+
     }
 
     private void SpawnEnemy(){
