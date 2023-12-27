@@ -3,18 +3,20 @@ package Entity;
 public class Player extends Mob{
     private byte currentRotation;//-1 -> lewo; 0 -> stoi; 1 -> prawo
     private float rotationSpeed;
+    private int maxHp;
     private float gunWidthMultiply;
     private float gunLengthMultiply;
     private int bulletSpeed;
 
     public Player(int hp, float radius, float angle, float[] position, float movementSpeed, boolean canShoot,
-                  float attackFrequency, int damage, byte currentRotation, float rotationSpeed, float gunLengthMultiply, float gunWidthMultiply, int bulletSpeed) {
+                  float attackFrequency, int damage, byte currentRotation, float rotationSpeed, float gunLengthMultiply, float gunWidthMultiply, int bulletSpeed, int maxHp) {
         super(hp, radius, angle, position, movementSpeed, canShoot, attackFrequency, damage);
         this.currentRotation = currentRotation;
         this.rotationSpeed = rotationSpeed;
         this.gunLengthMultiply = gunLengthMultiply;
         this.gunWidthMultiply = gunWidthMultiply;
         this.bulletSpeed = bulletSpeed;
+        this.maxHp = maxHp;
     }
     public Player() {
         super();
@@ -34,6 +36,12 @@ public class Player extends Mob{
         return rotationSpeed;
     }
     //mozliwa zmiana, np. zmiana statystyk w trakcie gry (lvl up)
+    public int getMaxHp() {
+        return maxHp;
+    }
+    public void setMaxHp(int maxHp) {
+        this.maxHp = maxHp;
+    }
 
     public void setRotationSpeed(float rotationSpeed) {
         this.rotationSpeed = rotationSpeed;
