@@ -1,5 +1,7 @@
 package Entity;
 
+import java.util.Arrays;
+
 public abstract class Entity {
     private int hp; //domyslnie 1 dla poczatkowej wersji gry
     private float radius; //typ zmiennej zalezny od skali osi wspolrzednych (do ustalenia)
@@ -74,6 +76,7 @@ public abstract class Entity {
         //metoda bedzie przyslonieta dla roznych klas, dla enemy i bullet
         //bedzie kasowac obiekt, a dla playera bedzie konczyc gre
     }
+
 
     @Override
     public String toString() {
