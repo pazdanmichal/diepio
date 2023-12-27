@@ -59,13 +59,4 @@ public abstract class Mob extends Entity {
     public void SpawnBullet(){
         //czekamy na interface
     }
-
-    @Override
-    public String toString() {
-        return super.toString() +
-                "\ncanShoot = " + canShoot +
-                "\nattackFrequency = " + attackFrequency +
-                "\ndamage = " + damage +
-                "\nshootTime = " + shootTime;
-    }
 }

@@ -1,4 +1,6 @@
 import Algorithms.Algorithm;
+import Algorithms.IdiotBot;
+import Algorithms.Strategy1;
 import BoardController.*;
 import Entity.*;
 import java.util.ArrayList;

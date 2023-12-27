@@ -1,0 +1,2 @@
+// int amount
+// entity: float movementSpeed, float radius, int hp, long delay
