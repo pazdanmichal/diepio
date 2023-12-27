@@ -1,7 +1,5 @@
 package Entity;
 
-import java.util.Arrays;
-
 public abstract class Entity {
     private int hp; //domyslnie 1 dla poczatkowej wersji gry
     private float radius; //typ zmiennej zalezny od skali osi wspolrzednych (do ustalenia)
@@ -78,12 +76,6 @@ public abstract class Entity {
     }
 
 
-    @Override
-    public String toString() {
-        return "hp = " + hp +
-                "\nradius = " + radius +
-                "\nangle = " + angle +
-                "\nposition = " + Arrays.toString(position) +
-                "\nmovementSpeed = " + movementSpeed;
-    }
+
+
 }

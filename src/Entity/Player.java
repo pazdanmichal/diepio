@@ -5,7 +5,7 @@ public class Player extends Mob{
     private float rotationSpeed;
     private float gunWidthMultiply;
     private float gunLengthMultiply;
-    private int bulletSpeed;
+    private int bulletSPeed;
 
     public Player(int hp, float radius, float angle, float[] position, float movementSpeed, boolean canShoot,
                   float attackFrequency, int damage, byte currentRotation, float rotationSpeed, float gunLengthMultiply, float gunWidthMultiply, int bulletSpeed) {
@@ -14,7 +14,7 @@ public class Player extends Mob{
         this.rotationSpeed = rotationSpeed;
         this.gunLengthMultiply = gunLengthMultiply;
         this.gunWidthMultiply = gunWidthMultiply;
-        this.bulletSpeed = bulletSpeed;
+        this.bulletSPeed = bulletSpeed;
     }
     public Player() {
         super();
@@ -59,21 +59,11 @@ public class Player extends Mob{
         this.gunLengthMultiply = gunLengthMultiply;
     }
 
-    public int getBulletSpeed() {
-        return bulletSpeed;
+    public int getBulletSPeed() {
+        return bulletSPeed;
     }
 
-    public void setBulletSpeed(int bulletSpeed) {
-        this.bulletSpeed = bulletSpeed;
-    }
-
-    @Override
-    public String toString() {
-        return "\nPlayer:\n" + super.toString() +
-                "\ncurrentRotation = " + currentRotation +
-                "\nrotationSpeed = " + rotationSpeed +
-                "\ngunWidthMultiply = " + gunWidthMultiply +
-                "\ngunLengthMultiply = " + gunLengthMultiply +
-                "\nbulletSPeed = " + bulletSpeed;
+    public void setBulletSPeed(int bulletSPeed) {
+        this.bulletSPeed = bulletSPeed;
     }
 }
