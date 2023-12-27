@@ -36,7 +36,6 @@ public class Screen extends BoardController{
     public Screen(int screenDimensionX, int screenDimensionY){
         this.screenDimensionX = screenDimensionX;
         this.screenDimensionY = screenDimensionY;
-        this.waveHandler=new WaveHandler();
     }
 
     public int getScreenDimensionX() {
@@ -146,7 +145,7 @@ public class Screen extends BoardController{
             // Calculate the end point of the line based on length and angle
             float endX = currentPosition[0] + currentPlayer.getRadius()*currentPlayer.getGunLengthMultiply() * (float) Math.cos(angleRad);
             float endY = currentPosition[1] + currentPlayer.getRadius()*currentPlayer.getGunLengthMultiply() * (float) Math.sin(angleRad);
-            entityCollider.addEntity(new Bullet(currentPlayer.getDamage(), currentPlayer.getRadius() * currentPlayer.getGunWidthMultiply() * 0.8f, currentPlayer.getAngle(), new float[] {endX, endY}, currentPlayer.getBulletSPeed(), true));
+            entityCollider.addEntity(new Bullet(currentPlayer.getDamage(), currentPlayer.getRadius() * currentPlayer.getGunWidthMultiply() * 0.8f, currentPlayer.getAngle(), new float[] {endX, endY}, currentPlayer.getBulletSpeed(), true));
             currentPlayer.setShootTime(elapsedTime);
             return true;
         }
@@ -219,7 +218,7 @@ public class Screen extends BoardController{
             if(currentPlayer == null) { return; }
 
             if(!waveHandler.IsRunning(enemyList())){
-                waveHandler.NewWave(2);
+                waveHandler.NextWave();
                 if(playerAlgorithm != null) playerAlgorithm.Init(enemyList(), currentPlayer, System.currentTimeMillis());
             }
             else {
@@ -275,8 +274,8 @@ public class Screen extends BoardController{
     }
     public void RunGame(Algorithm _playerAlgorithm){
 
-            playerAlgorithm = _playerAlgorithm;
-            waveHandler = new WaveHandler();
+        playerAlgorithm = _playerAlgorithm;
+        waveHandler = new WaveHandler(3, "TestWaves0");
 
         InitialScreenSettings();
 

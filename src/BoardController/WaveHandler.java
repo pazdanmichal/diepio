@@ -14,25 +14,25 @@ public class WaveHandler {
 
     private long startTime;
     private List<SimpleEntry<Enemy, Long>> enemiesToSpawn;
+    private int numberOfWaves;
+    private int currentWave = 0;
+    private String wavePackageName;
 
-    public WaveHandler(){
-
+    public WaveHandler(int numberOfWaves, String wavePackageName){
+        this.numberOfWaves = numberOfWaves;
+        this.wavePackageName = wavePackageName;
     }
 
     private void sort(){
         Collections.sort(enemiesToSpawn, Comparator.comparingLong(SimpleEntry::getValue));
     }
 
-
-
-    // Bing
-
     public void readEnemiesFromFile(String filename) {
         enemiesToSpawn = new ArrayList<>();
         try (BufferedReader br = new BufferedReader(new FileReader(filename))) {
             int numEnemies = Integer.parseInt(br.readLine());
             for (int i = 0; i < numEnemies; i++) {
-                String[] enemyData = br.readLine().split("\t");
+                String[] enemyData = br.readLine().split(" ");
                 float movementSpeed = Float.parseFloat(enemyData[0]);
                 float radius = Float.parseFloat(enemyData[1]);
                 int hp = Integer.parseInt(enemyData[2]);
@@ -44,12 +44,11 @@ public class WaveHandler {
             e.printStackTrace();
         }
     }
-
-    // Bing
-
-
-    public void NewWave(int waveId){
-        readEnemiesFromFile("src/Waves/wave" + waveId + ".txt");
+    public void NextWave(){
+        readEnemiesFromFile("src/Waves/" + wavePackageName + "/wave" + currentWave + ".txt");
+        System.out.println("Wave " + currentWave + " from package " + wavePackageName + " has been started!");
+        int nextWaveIndex = (currentWave+1)%numberOfWaves;
+        currentWave = nextWaveIndex;
         sort();
 
         this.startTime = System.currentTimeMillis();
