@@ -1,4 +1,5 @@
 package BoardController;
+
 import Algorithms.Algorithm;
 import Algorithms.IdiotBot;
 import Entity.Entity;
@@ -21,7 +22,7 @@ public class Screen extends BoardController{
     private int screenDimensionX;
     private int screenDimensionY;
     private long spawnedEnemies;
-    private Collider entityCollider;
+    private static Collider entityCollider;
     private long window;
     private long startTime;
     private long frame;
@@ -29,8 +30,9 @@ public class Screen extends BoardController{
     private Algorithm playerAlgorithm;
     private boolean _isSpawnedFirstWave;
     private Player currentPlayer;
-    private ArrayList <Entity> currentEntityTable;
     private UpgradeWindow upgradeWindow;
+    public static ArrayList<Entity> currentEntityTable;
+    private WaveHandler waveHandler;
 
     public Screen(int screenDimensionX, int screenDimensionY){
         this.screenDimensionX = screenDimensionX;
@@ -144,7 +146,7 @@ public class Screen extends BoardController{
             // Calculate the end point of the line based on length and angle
             float endX = currentPosition[0] + currentPlayer.getRadius()*currentPlayer.getGunLengthMultiply() * (float) Math.cos(angleRad);
             float endY = currentPosition[1] + currentPlayer.getRadius()*currentPlayer.getGunLengthMultiply() * (float) Math.sin(angleRad);
-            entityCollider.addEntity(new Bullet(currentPlayer.getDamage(), currentPlayer.getRadius() * currentPlayer.getGunWidthMultiply() * 0.8f, currentPlayer.getAngle(), new float[] {endX, endY}, currentPlayer.getBulletSPeed(), true));
+            entityCollider.addEntity(new Bullet(currentPlayer.getDamage(), currentPlayer.getRadius() * currentPlayer.getGunWidthMultiply() * 0.8f, currentPlayer.getAngle(), new float[] {endX, endY}, currentPlayer.getBulletSpeed(), true));
             currentPlayer.setShootTime(elapsedTime);
             return true;
         }
@@ -152,21 +154,11 @@ public class Screen extends BoardController{
 
     }
 
-    private void SpawnEnemy(){
-        spawnedEnemies += 1;
-        float angle = random.nextFloat() * 2 * (float) Math.PI;
-        float x = 700 * (float) Math.cos(angle);
-        float y = 700 * (float) Math.sin(angle);
-        angle = (360*angle)/(2*(float)Math.PI);
-        angle += 180;
-        entityCollider.addEntity(new Enemy(1, 20, angle, new float[] {x, y}, 0.5f, false, 0, 0));
+    public static void AddEnemy(Enemy enemy){
+        entityCollider.addEntity(enemy);
+        currentEntityTable.add(enemy);
     }
 
-    private void SpawnWave(long amountOfEnemies){
-        for (int i = 0; i<amountOfEnemies; ++i){
-            SpawnEnemy();
-        }
-    }
 
     private void KeyListener(Player currentPlayer){
 
@@ -192,7 +184,9 @@ public class Screen extends BoardController{
         long currentTime = System.currentTimeMillis();
         currentPlayer.setCurrentRotation(playerAlgorithm.Move(currentTime));
         boolean _isShooted = false;
-        if(playerAlgorithm.TryShoot(currentTime)) { _isShooted = Shoot(currentPlayer); }
+        if (playerAlgorithm.TryShoot(currentTime)) {
+            _isShooted = Shoot(currentPlayer);
+        }
         List<Enemy> enemies = new ArrayList<Enemy>();
         for(Entity entity : currentEntityTable){
             if(entity instanceof Enemy){
@@ -202,7 +196,15 @@ public class Screen extends BoardController{
         playerAlgorithm.FetchCurrentFrameInfo(currentTime, _isShooted, enemies, currentPlayer);
     }
 
-    private void GameLoop(){
+    private List<Enemy> enemyList() {
+        List<Enemy> enemies = new ArrayList<Enemy>();
+        for (Entity entity : currentEntityTable) {
+            if (entity instanceof Enemy) enemies.add((Enemy) entity);
+        }
+        return enemies;
+    }
+
+    private void GameLoop() {
         while (!glfwWindowShouldClose(window) && currentPlayer != null) {
             frame += 1;
 
@@ -222,28 +224,17 @@ public class Screen extends BoardController{
             currentPlayer = findPlayer(currentEntityTable);
             if(currentPlayer == null) { return; }
 
-            // Tymczasowe ify dopoki nie powstanie WaveHandler
-
-            if(playerAlgorithm == null) {
-                // Dosyc fajne skalowanie fali
-                random = new Random();
-                if (frame % 100 == 0) {
-                    SpawnWave((long) random.nextInt(1 + (int) (frame / 1000), 3 + (int) (frame / 1000)));
-                }
-                KeyListener(currentPlayer);
+            if(!waveHandler.IsRunning(enemyList())){
+                waveHandler.NextWave();
+                if(playerAlgorithm != null) playerAlgorithm.Init(enemyList(), currentPlayer, System.currentTimeMillis());
             }
             else {
-                if (!_isSpawnedFirstWave) {
-                    _isSpawnedFirstWave = true;
-                    SpawnWave(20);
-                    List<Enemy> enemies = new ArrayList<Enemy>();
-                    for (Entity entity : currentEntityTable) {
-                        if (entity instanceof Enemy) enemies.add((Enemy) entity);
-                    }
-
-                    playerAlgorithm.Init(enemies, currentPlayer, System.currentTimeMillis());
+                waveHandler.TrySpawnEnemy(System.currentTimeMillis());
+                if (playerAlgorithm == null) {
+                    KeyListener(currentPlayer);
+                } else {
+                    AutonomicBotMove();
                 }
-                AutonomicBotMove();
             }
 
             DrawEntities();
@@ -291,6 +282,7 @@ public class Screen extends BoardController{
     public void RunGame(Algorithm _playerAlgorithm){
 
         playerAlgorithm = _playerAlgorithm;
+        waveHandler = new WaveHandler(3, "TestWaves0");
 
         InitialScreenSettings();
 

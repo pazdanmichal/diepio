@@ -1,4 +1,6 @@
 import Algorithms.Algorithm;
+import Algorithms.IdiotBot;
+import Algorithms.Strategy1;
 import BoardController.*;
 import Entity.*;
 import java.util.ArrayList;
@@ -21,7 +23,7 @@ public class Main {
         // Przesłanie ArrayListy z graczem (Player) do instancji klasy Screen
         currentScreen.setEntityTable(currentEntityTable);
 
-        // Jakies gowno ze sztuczna inteligencja
+        // Jakies cos ze sztuczna inteligencja
         Algorithm playerAlgorithm = null; // nowy IdiotBot();
         currentScreen.RunGame(playerAlgorithm);
     }
