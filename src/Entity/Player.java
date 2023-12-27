@@ -66,4 +66,14 @@ public class Player extends Mob{
     public void setBulletSPeed(int bulletSPeed) {
         this.bulletSPeed = bulletSPeed;
     }
+
+    @Override
+    public String toString() {
+        return "\nPlayer:\n" + super.toString() +
+                "\ncurrentRotation = " + currentRotation +
+                "\nrotationSpeed = " + rotationSpeed +
+                "\ngunWidthMultiply = " + gunWidthMultiply +
+                "\ngunLengthMultiply = " + gunLengthMultiply +
+                "\nbulletSPeed = " + bulletSpeed;
+    }
 }

@@ -2,8 +2,6 @@ package Entity;
 
 public abstract class Mob extends Entity {
     private boolean canShoot;
-
-    // sth
     private float attackFrequency;
     private int damage;
     private long shootTime = 0;
@@ -60,5 +58,14 @@ public abstract class Mob extends Entity {
 
     public void SpawnBullet(){
         //czekamy na interface
+    }
+
+    @Override
+    public String toString() {
+        return super.toString() +
+                "\ncanShoot = " + canShoot +
+                "\nattackFrequency = " + attackFrequency +
+                "\ndamage = " + damage +
+                "\nshootTime = " + shootTime;
     }
 }

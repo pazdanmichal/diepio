@@ -75,7 +75,12 @@ public abstract class Entity {
         //bedzie kasowac obiekt, a dla playera bedzie konczyc gre
     }
 
-
-
-
+    @Override
+    public String toString() {
+        return "hp = " + hp +
+                "\nradius = " + radius +
+                "\nangle = " + angle +
+                "\nposition = " + Arrays.toString(position) +
+                "\nmovementSpeed = " + movementSpeed;
+    }
 }
