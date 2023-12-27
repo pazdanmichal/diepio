@@ -227,8 +227,14 @@ public class Screen extends BoardController{
             }
             else {
                 if (!_isSpawnedFirstWave) {
-                    _isSpawnedFirstWave = true;
-                    SpawnWave(20);
+//                    _isSpawnedFirstWave = true;
+//                    SpawnWave(20);
+
+                    //losowe spawnowanie wrogów
+                    if (frame % 100 == 0) {
+                        SpawnWave((long) random.nextInt(1 + (int) (frame / 1000), 3 + (int) (frame / 1000)));
+                    }
+
                     List<Enemy> enemies = new ArrayList<Enemy>();
                     for (Entity entity : currentEntityTable) {
                         if (entity instanceof Enemy) enemies.add((Enemy) entity);
