@@ -10,21 +10,17 @@ public class Main {
 
         // Tworzenie nowego ekranu
         Screen currentScreen = new Screen(900, 900);
-
-        // Deklarowanie pustej listy wszystkich obiektow (Entity)
-        ArrayList<Entity> currentEntityTable = new ArrayList<>();
+        Screen.setBoardRadius(900);
 
         // Dodawanie nowego gracza i inicjalizowanie jego statystyk
-        currentEntityTable.add(new Player(
+        Player player = new Player(
                 10, 50.0f, 270.0f, new float[]{0.0f, 0.0f},
                 0, true, 300, 2, (byte) 0,
-                1.5f, 1.7f, 0.65f, 7, 10));
+                1.5f, 1.7f, 0.65f, 7, 10);
 
-        // Przesłanie ArrayListy z graczem (Player) do instancji klasy Screen
-        currentScreen.setEntityTable(currentEntityTable);
 
         // Jakies cos ze sztuczna inteligencja
         Algorithm playerAlgorithm = null; // nowy IdiotBot();
-        currentScreen.RunGame(playerAlgorithm);
+        currentScreen.RunGame(playerAlgorithm, player);
     }
 }

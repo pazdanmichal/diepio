@@ -3,9 +3,12 @@ import Entity.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
 
 public class Collider extends BoardController{
+
     public Collider(){};
+
     public void RotatePlayer(Entity entity){
         Player player = (Player) entity;
         if (player.getCurrentRotation() == (byte) -1) {
@@ -28,82 +31,77 @@ public class Collider extends BoardController{
         entity.setPosition(finalPos);
     }
 
-    public void RenderStep(ArrayList<Entity> entityTable){
-        for (Entity entity : entityTable) {
 
-            // Jeśli obiekt jest klasą Player to go obróć
-            if (entity instanceof Player) {
-                RotatePlayer(entity);
-            }
-
-            // Jeśli obiekt jest klasą Bullet albo Enemy to go przesuń
-            if ((entity instanceof Bullet) || (entity instanceof Enemy)) {
-                MoveEntity(entity);
-            }
+    public void RenderStep(){
+        RotatePlayer(getCurrentPlayer());
+        for (Entity enemyBullet : getEnemyBulletTable()){
+            MoveEntity(enemyBullet);
         }
-        super.setEntityTable(entityTable);
+
+        for (Entity allyBullet : getAllyBulletTable()){
+            MoveEntity(allyBullet);
+        }
+
+        for (Entity enemy : getEnemyTable()){
+            MoveEntity(enemy);
+        }
+
+    }
+    public void ExecuteCollision(Entity object1, Entity object2){
+        float[] pos1 = object1.getPosition(), pos2 = object2.getPosition();
+        float radius1 = object1.getRadius(), radius2 = object2.getRadius();
+        boolean collisionOccurs = Math.sqrt(Math.pow((pos1[0]-pos2[0]),2) + Math.pow((pos1[1]-pos2[1]),2))
+                <= radius1 + radius2;
+
+        if (collisionOccurs) {
+            int minHp = Math.min(object1.getHp(), object2.getHp());
+            object1.setHp(object1.getHp() - minHp);
+            object2.setHp(object2.getHp() - minHp);
+        }
     }
 
-    public ArrayList<ArrayList<Entity>> ObjectCollision(ArrayList<Entity> objectArray1, ArrayList<Entity> objectArray2) {
+    public void ObjectCollision(ArrayList<Entity> objectArray1, ArrayList<Entity> objectArray2) {
         for (Entity object1: objectArray1) {
             for (Entity object2: objectArray2) {
-                float[] pos1 = object1.getPosition(), pos2 = object2.getPosition();
-                float radius1 = object1.getRadius(), radius2 = object2.getRadius();
-                boolean collisionOccurs = Math.sqrt(Math.pow((pos1[0]-pos2[0]),2) + Math.pow((pos1[1]-pos2[1]),2))
-                        <= radius1 + radius2;
-
-                if (collisionOccurs) {
-                    int minHp = Math.min(object1.getHp(), object2.getHp());
-                    object1.setHp(object1.getHp() - minHp);
-                    object2.setHp(object2.getHp() - minHp);
-                }
+                ExecuteCollision(object1, object2);
             }
         }
-        return new ArrayList<> (Arrays.asList(objectArray1, objectArray2));
     }
 
-    public void CheckColisions(ArrayList<Entity> entityTable){
-        ArrayList<Entity> allyBulletTable = new ArrayList<>(), enemyBulletTable = new ArrayList<>(),
-                enemyTable = new ArrayList<>(), playerTable = new ArrayList<>();
-
-        for (Entity entity : entityTable) {
-            if (entity instanceof Bullet) {
-                Bullet currentBullet = (Bullet) entity;
-                if (currentBullet.isAlly()) {
-                    allyBulletTable.add(currentBullet);
-                } else {
-                    enemyBulletTable.add(currentBullet);
-                }
+    public ArrayList<Entity> RemoveDeadEntities(ArrayList<Entity>currentEntityTable){
+        Iterator<Entity> iterator = currentEntityTable.iterator();
+        while (iterator.hasNext()) {
+            Entity entity = iterator.next();
+            if (entity.getHp() <= 0) {
+                iterator.remove(); // Remove the current element
             }
-            if (entity instanceof Enemy)    { enemyTable.add((Enemy) entity);   }
-            if (entity instanceof Player)   { playerTable.add(entity);          }
         }
+        return currentEntityTable;
+    }
 
-        ArrayList<ArrayList<Entity>> x = ObjectCollision(allyBulletTable, enemyTable);
-        allyBulletTable = x.get(0); enemyTable = x.get(1);
+    public void CheckColisions(){
 
-        ArrayList<ArrayList<Entity>> y = ObjectCollision(enemyTable, playerTable);
-        enemyTable = y.get(0); playerTable = y.get(1);
+        ObjectCollision(getAllyBulletTable(), getEnemyTable());
+
+        ArrayList<Entity>playerTable = new ArrayList<>();
+        playerTable.add(getCurrentPlayer());
+
+        ObjectCollision(getEnemyTable(), playerTable);
 
         // Tworzenie granic lotu poscisków
-        for (Entity entity : allyBulletTable) {
+        for (Entity entity : getAllyBulletTable()) {
             Bullet bullet = (Bullet) entity;
 
             float bulletPosX = bullet.getPosition()[0], bulletPosY = bullet.getPosition()[1];
-            boolean hitBoundary = Math.sqrt(Math.pow(bulletPosX, 2) + Math.pow(bulletPosY, 2)) >= this.getBoardRadius();
+            boolean hitBoundary = Math.sqrt(Math.pow(bulletPosX, 2) + Math.pow(bulletPosY, 2)) >= getBoardRadius();
             if (hitBoundary) {
                 bullet.setHp(0);
             }
         }
 
-        ArrayList<Entity> newEntityTable = new ArrayList<>();
-        for (Entity entity: entityTable) {
-            if (entity.getHp() > 0) {
-                newEntityTable.add(entity);
-            }
-        }
-
-        super.setEntityTable(newEntityTable);
+        setEnemyBulletTable(RemoveDeadEntities(getEnemyBulletTable()));
+        setAllyBulletTable(RemoveDeadEntities(getAllyBulletTable()));
+        setEnemyTable(RemoveDeadEntities(getEnemyTable()));
 
     }
 }
