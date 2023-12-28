@@ -24,7 +24,7 @@ public class WaveHandler {
     }
 
     private void sort(){
-        Collections.sort(enemiesToSpawn, Comparator.comparingLong(SimpleEntry::getValue));
+        enemiesToSpawn.sort(Comparator.comparingLong(SimpleEntry::getValue));
     }
 
     public void readEnemiesFromFile(String filename) {
@@ -56,7 +56,7 @@ public class WaveHandler {
 
         /*
         Random random=new Random();
-        /* SpawnWave(random.nextInt(1 + (int) (frame / 1000), 3 + (int) (frame / 1000)),0.5f,20,1);
+        SpawnWave(random.nextInt(1 + (int) (frame / 1000), 3 + (int) (frame / 1000)),0.5f,20,1);
         int amountOfEnemies = random.nextInt(1 + (int) (frame / 1000), 3 + (int) (frame / 1000));
         float movementSpeed = 5f;
         float radius = 20;
@@ -65,14 +65,15 @@ public class WaveHandler {
         for (int i = 0; i < amountOfEnemies; ++i) {
             CreateEnemy(movementSpeed, radius, hp);
         }
-        /*amount of enemies random.nextInt(1 + (int) (frame / 1000), 3 + (int) (frame / 1000))*/
+        amount of enemies random.nextInt(1 + (int) (frame / 1000), 3 + (int) (frame / 1000))
+        */
 
     }
 
-    public void TrySpawnEnemy(long _time) {
+    public void TrySpawnEnemy(long _time, Screen screen) {
         if (!enemiesToSpawn.isEmpty()) {
             if (_time - startTime >= enemiesToSpawn.get(0).getValue()) {
-                Screen.AddEnemy(enemiesToSpawn.get(0).getKey());
+                screen.AddEnemy(enemiesToSpawn.get(0).getKey());
                 enemiesToSpawn.remove(0);
             }
         }
