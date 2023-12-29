@@ -70,10 +70,10 @@ public class WaveHandler {
 
     }
 
-    public void TrySpawnEnemy(long _time, Screen screen) {
+    public void TrySpawnEnemy(long _time) {
         if (!enemiesToSpawn.isEmpty()) {
             if (_time - startTime >= enemiesToSpawn.get(0).getValue()) {
-                screen.AddEnemy(enemiesToSpawn.get(0).getKey());
+                Screen.AddEnemy(enemiesToSpawn.get(0).getKey());
                 enemiesToSpawn.remove(0);
             }
         }
