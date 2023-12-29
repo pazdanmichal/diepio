@@ -1,11 +1,7 @@
 package BoardController;
 
 import Algorithms.Algorithm;
-import Algorithms.IdiotBot;
-import Entity.Entity;
-import Entity.Player;
-import Entity.Enemy;
-import Entity.Bullet;
+import Entity.*;
 import org.lwjgl.glfw.GLFWVidMode;
 
 import java.util.ArrayList;
@@ -54,6 +50,10 @@ public class Screen extends BoardController {
 
     public void setScreenDimensionY(int screenDimensionY) {
         this.screenDimensionY = screenDimensionY;
+    }
+
+    public long getStartTime() {
+        return startTime;
     }
 
     public void drawCircle(float colorA, float colorB, float colorC, float radius, float centerX, float centerY) {
@@ -156,7 +156,6 @@ public class Screen extends BoardController {
         entityCollider.addEntity(enemy);
     }
 
-
     private void KeyListener(Player currentPlayer) {
 
         if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) {
@@ -180,22 +179,19 @@ public class Screen extends BoardController {
     }
 
     private void AutonomicBotMove() {
-        playerAlgorithm.Init(enemyList(), getCurrentPlayer(), startTime);
+        playerAlgorithm.Init(this);
 
-        long currentTime = System.currentTimeMillis();
-        getCurrentPlayer().setCurrentRotation(playerAlgorithm.Move(currentTime));
-        boolean _isShooted = false;
-        if (playerAlgorithm.TryShoot(currentTime)) {
-            _isShooted = Shoot(getCurrentPlayer());
+        getCurrentPlayer().setCurrentRotation(playerAlgorithm.Move());
+
+        boolean isShooted = false;
+        if (playerAlgorithm.TryShoot()) {
+            isShooted = Shoot(getCurrentPlayer());
         }
-        List<Enemy> enemies = new ArrayList<>();
-        for (Entity entity : getEnemyTable()) {
-            enemies.add((Enemy) entity);
-        }
-        playerAlgorithm.FetchCurrentFrameInfo(currentTime, _isShooted, enemies, getCurrentPlayer());
+
+        playerAlgorithm.FetchCurrentFrameInfo(isShooted);
     }
 
-    private List<Enemy> enemyList() {
+    public List<Enemy> enemyList() {
         List<Enemy> enemies = new ArrayList<>();
         for (Entity entity : getEnemyTable()) {
             enemies.add((Enemy) entity);

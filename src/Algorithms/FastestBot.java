@@ -1,15 +1,14 @@
 package Algorithms;
 
-import Entity.Enemy;
-import Entity.Entity;
-import Entity.Player;
+import BoardController.Screen;
+import Entity.*;
 
 import java.util.List;
 
-public class Strategy1 implements Algorithm {
-    private Enemy fastestEnemy;
+public class FastestBot implements Algorithm {
     private Player player;
     private List<Enemy> enemies;
+    private Enemy fastestEnemy;
 
     private Enemy findFastestEnemy(List<Enemy> enemies) {
         if (enemies.isEmpty()) {
@@ -53,14 +52,16 @@ public class Strategy1 implements Algorithm {
     }
 
     @Override
-    public void Init(List<Enemy> enemies, Player player, long startTime) {
-        this.player = player;
-        this.enemies = enemies;
+    public void Init(Screen screen) {
+        this.player = Screen.getCurrentPlayer();
+        this.enemies = screen.enemyList();
+
+        fastestEnemy = findFastestEnemy(enemies);
     }
 
     @Override
-    public byte Move(long _time) {
-        fastestEnemy = findFastestEnemy(enemies);
+    public byte Move() {
+        //najoptymalniejsze obracanie się do wroga który dotrze najszybciej
         if (fastestEnemy == null || angleBetween(fastestEnemy) < 0.1) {
             return 0;
         } else if (mod(mod(player.getAngle(),360) - mod(fastestEnemy.getAngle()+180,360), 360) >= 180) {
@@ -71,7 +72,8 @@ public class Strategy1 implements Algorithm {
     }
 
     @Override
-    public boolean TryShoot(long _time) {
+    public boolean TryShoot() {
+        //strzelanie tylko wtedy gdy gracz namierza na jakiegokolwiek wroga
         if (fastestEnemy != null){
             for (Enemy enemy : enemies) {
                 if (angleBetween(enemy) < 1) {
@@ -83,11 +85,9 @@ public class Strategy1 implements Algorithm {
     }
 
     @Override
-    public void FetchCurrentFrameInfo(long _time, boolean isShooted, List<Enemy> enemies, Player player) {
-        if (fastestEnemy != null) {
-            System.out.println(angleBetween(fastestEnemy));
-        }
+    public void FetchCurrentFrameInfo(boolean isShooted) {
+        //wyświetlanie kąta między graczem a wrogiem który dotrze najszybciej
+//        if (fastestEnemy != null) { System.out.println(angleBetween(fastestEnemy)); }
     }
-
 
 }
