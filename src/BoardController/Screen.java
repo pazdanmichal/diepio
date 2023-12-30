@@ -56,6 +56,10 @@ public class Screen extends BoardController {
         return startTime;
     }
 
+    public WaveHandler getWaveHandler() {
+        return waveHandler;
+    }
+
     public void drawCircle(float colorA, float colorB, float colorC, float radius, float centerX, float centerY) {
         centerX += (float) screenDimensionX / 2;
         centerY += (float) screenDimensionY / 2;
@@ -157,11 +161,11 @@ public class Screen extends BoardController {
     }
 
     private void KeyListener(Player currentPlayer) {
-
         if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) {
             // Spacebar is pressed
             Shoot(currentPlayer);
         }
+
         if ((glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) && (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)) {
             // both A and D are pressed
             currentPlayer.setCurrentRotation((byte) 0);
@@ -175,7 +179,6 @@ public class Screen extends BoardController {
             // nothing is pressed
             currentPlayer.setCurrentRotation((byte) 0);
         }
-
     }
 
     private void AutonomicBotMove() {
@@ -274,7 +277,7 @@ public class Screen extends BoardController {
     public void RunGame(Algorithm _playerAlgorithm, Player currentPlayer) {
 
         playerAlgorithm = _playerAlgorithm;
-        waveHandler = new WaveHandler(3, "TestWaves0");
+        waveHandler = new WaveHandler(4, "TestWaves0");
 
         InitialScreenSettings();
 

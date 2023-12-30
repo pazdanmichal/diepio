@@ -17,7 +17,7 @@ public class Main {
 
 
         // Jakies cos ze sztuczna inteligencja
-        Algorithm playerAlgorithm = new FastestBot(); // new Algorithm();
+        Algorithm playerAlgorithm = new GroupBot(); // new Algorithm();
         currentScreen.RunGame(playerAlgorithm, player);
     }
 }
