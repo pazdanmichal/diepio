@@ -1,14 +1,17 @@
 package BoardController;
 
 import Algorithms.Algorithm;
-import Algorithms.IdiotBot;
 import Entity.Entity;
 import Entity.Player;
 import Entity.Enemy;
 import Entity.Bullet;
+import org.lwjgl.BufferUtils;
 import org.lwjgl.glfw.GLFWVidMode;
+import org.lwjgl.opengl.GL11;
+import org.lwjgl.stb.STBImage;
 
-import javax.swing.plaf.basic.BasicSplitPaneUI;
+import java.nio.ByteBuffer;
+import java.nio.IntBuffer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -18,10 +21,8 @@ import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL.createCapabilities;
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.system.MemoryUtil.NULL;
-import static org.lwjgl.glfw.GLFW.*;
-import static org.lwjgl.opengl.GL11.*;
 
-public class Screen extends BoardController{
+public class Screen extends BoardController {
     private int screenDimensionX;
     private int screenDimensionY;
     private long spawnedEnemies;
@@ -32,9 +33,8 @@ public class Screen extends BoardController{
     private Random random;
     private Algorithm playerAlgorithm;
     private boolean _isSpawnedFirstWave;
-    private UpgradeWindow upgradeWindow;
     private WaveHandler waveHandler;
-
+    private long lastframe = 0;
 
     public Screen(int screenDimensionX, int screenDimensionY) {
         this.screenDimensionX = screenDimensionX;
@@ -59,9 +59,10 @@ public class Screen extends BoardController{
     public void setScreenDimensionY(int screenDimensionY) {
         this.screenDimensionY = screenDimensionY;
     }
-    public void drawCircle(float colorA, float colorB, float colorC, float radius, float centerX, float centerY){
-        centerX += screenDimensionX/2f;
-        centerY += screenDimensionY/2f;
+
+    public void drawCircle(float colorA, float colorB, float colorC, float radius, float centerX, float centerY) {
+        centerX += screenDimensionX / 2f;
+        centerY += screenDimensionY / 2f;
         glColor3f(colorA, colorB, colorC);
         glBegin(GL_TRIANGLE_FAN);
         glVertex2f(centerX, centerY); // Center of the circle
@@ -77,8 +78,8 @@ public class Screen extends BoardController{
     }
 
     public void drawLine(float colorA, float colorB, float colorC, float startX, float startY, float length, float thickness, float angle) {
-        startX += screenDimensionX/2f;
-        startY += screenDimensionY/2f;
+        startX += screenDimensionX / 2f;
+        startY += screenDimensionY / 2f;
         glColor3f(colorA, colorB, colorC);
 
         // Convert angle to radians
@@ -113,23 +114,69 @@ public class Screen extends BoardController{
 
     private void DrawHealthBar(Entity entity) {
 
-        if (entity instanceof Player){
-            float barLength = screenDimensionX/12f * entity.getMaxHp(), barThickness = 8;
+        if (entity instanceof Player) {
+            float barLength = screenDimensionX / 1.2f, barThickness = 8;
 
             // szara ramka
-            drawLine(0.95f,0.95f,0.95f,
-                    -barLength/2f, screenDimensionY/2f * 0.9f,
+            drawLine(0.95f, 0.95f, 0.95f,
+                    -barLength / 2f, screenDimensionY / 2f * 0.9f,
                     barLength, barThickness, 0);
 
             // zielony pasek
             float healthBarLength = barLength / entity.getMaxHp() * entity.getHp();
-            drawLine(0,1,0,
-                    -healthBarLength/2f, screenDimensionY/2f * 0.9f,
-                    healthBarLength , barThickness, 0);
+            drawLine(0, 1, 0,
+                    -healthBarLength / 2f, screenDimensionY / 2f * 0.9f,
+                    healthBarLength, barThickness, 0);
         }
     }
 
-    private void DrawEntities(){
+    private int textureId;
+
+    private int loadTexture(String filePath) { //obsluga jpeg
+        IntBuffer width = BufferUtils.createIntBuffer(1);
+        IntBuffer height = BufferUtils.createIntBuffer(1);
+        IntBuffer channels = BufferUtils.createIntBuffer(1);
+
+        ByteBuffer image = STBImage.stbi_load(filePath, width, height, channels, 4);
+
+        if (image == null) {
+            throw new RuntimeException("Failed to load texture file: " + filePath);
+        }
+
+        int textureId = GL11.glGenTextures();
+        GL11.glBindTexture(GL11.GL_TEXTURE_2D, textureId);
+        GL11.glPixelStorei(GL11.GL_UNPACK_ALIGNMENT, 1);
+        GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_LINEAR);
+        GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_LINEAR);
+
+        GL11.glTexImage2D(GL11.GL_TEXTURE_2D, 0, GL11.GL_RGBA, width.get(0), height.get(0), 0, GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, image);
+
+        STBImage.stbi_image_free(image);
+
+        return textureId;
+    }
+
+    private void DrawUpgradeWindow() {
+        textureId = loadTexture("src/BoardController/JPGFILES/upgrade.jpeg");
+        GL11.glEnable(GL11.GL_TEXTURE_2D);
+        GL11.glBindTexture(GL11.GL_TEXTURE_2D, textureId);
+
+        // Renderuj kwadrat z teksturą
+        GL11.glBegin(GL11.GL_QUADS);
+        GL11.glTexCoord2f(0, 0);
+        GL11.glVertex2f(100, 100);
+        GL11.glTexCoord2f(1, 0);
+        GL11.glVertex2f(200, 100);
+        GL11.glTexCoord2f(1, 1);
+        GL11.glVertex2f(200, 200);
+        GL11.glTexCoord2f(0, 1);
+        GL11.glVertex2f(100, 200);
+        GL11.glEnd();
+
+        GL11.glDisable(GL11.GL_TEXTURE_2D);
+    }
+
+    private void DrawEntities() {
 
         Player player = getCurrentPlayer();
 
@@ -150,28 +197,33 @@ public class Screen extends BoardController{
         drawCircle(0, 0.75f, 1, player.getRadius(), player.getPosition()[0], player.getPosition()[1]);
 
         DrawHealthBar(player);
+        if (getCurrentPlayer().getCurrentPkt() > 0) {
+            drawCircle(0.2f, 0.4f, 1, 50, 200, 0);
+            DrawUpgradeWindow();
+        }
+
     }
 
-    private boolean PlayerAlive(){
-        if (getCurrentPlayer().getHp() <= 0){
+    private boolean PlayerAlive() {
+        if (getCurrentPlayer().getHp() <= 0) {
             return false;
         }
         return true;
     }
 
-    private boolean Shoot(Player currentPlayer){
+    private boolean Shoot(Player currentPlayer) {
         long currentTime = System.currentTimeMillis();
         long elapsedTime = currentTime - startTime;
-        if (elapsedTime > currentPlayer.getShootTime() + currentPlayer.getAttackFrequency()){
+        if (elapsedTime > currentPlayer.getShootTime() + currentPlayer.getAttackFrequency()) {
             float[] currentPosition = currentPlayer.getPosition();
             float rotation = currentPlayer.getAngle();
 
             double angleRad = Math.toRadians(rotation);
 
             // Calculate the end point of the line based on length and angle
-            float endX = currentPosition[0] + currentPlayer.getRadius()*currentPlayer.getGunLengthMultiply() * (float) Math.cos(angleRad);
-            float endY = currentPosition[1] + currentPlayer.getRadius()*currentPlayer.getGunLengthMultiply() * (float) Math.sin(angleRad);
-            entityCollider.addEntity(new Bullet(currentPlayer.getDamage(), currentPlayer.getRadius() * currentPlayer.getGunWidthMultiply() * 0.8f, currentPlayer.getAngle(), new float[] {endX, endY}, currentPlayer.getBulletSpeed(), true));
+            float endX = currentPosition[0] + currentPlayer.getRadius() * currentPlayer.getGunLengthMultiply() * (float) Math.cos(angleRad);
+            float endY = currentPosition[1] + currentPlayer.getRadius() * currentPlayer.getGunLengthMultiply() * (float) Math.sin(angleRad);
+            entityCollider.addEntity(new Bullet(currentPlayer.getDamage(), currentPlayer.getRadius() * currentPlayer.getGunWidthMultiply() * 0.8f, currentPlayer.getAngle(), new float[]{endX, endY}, currentPlayer.getBulletSpeed(), true));
             currentPlayer.setShootTime(elapsedTime);
             return true;
         }
@@ -179,34 +231,45 @@ public class Screen extends BoardController{
 
     }
 
-    public static void AddEnemy(Enemy enemy){
+    public static void AddEnemy(Enemy enemy) {
         entityCollider.addEntity(enemy);
     }
 
 
-    private void KeyListener(Player currentPlayer){
+    private void KeyListener(Player currentPlayer) {
 
         if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) {
             // Spacebar is pressed
             Shoot(currentPlayer);
         }
-        if ((glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)&&(glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)){
+        if ((glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) && (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)) {
             // both A and D are pressed
-            currentPlayer.setCurrentRotation((byte)0);
+            currentPlayer.setCurrentRotation((byte) 0);
         } else if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
             // D is pressed
-            currentPlayer.setCurrentRotation((byte)1);
+            currentPlayer.setCurrentRotation((byte) 1);
         } else if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
             // A is pressed
-            currentPlayer.setCurrentRotation((byte)-1);
-        } else if ((glfwGetKey(window, GLFW_KEY_D) == GLFW_RELEASE)&&(glfwGetKey(window, GLFW_KEY_A) == GLFW_RELEASE)) {
+            currentPlayer.setCurrentRotation((byte) -1);
+        } else if ((glfwGetKey(window, GLFW_KEY_D) == GLFW_RELEASE) && (glfwGetKey(window, GLFW_KEY_A) == GLFW_RELEASE)) {
             // nothing is pressed
-            currentPlayer.setCurrentRotation((byte)0);
+            currentPlayer.setCurrentRotation((byte) 0);
+        }
+
+        if ((glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS) && frame - lastframe > 100) {
+            UpgradeWindow.upgrade(1, currentPlayer); //zwiekszenie maxHP
+            lastframe = frame;
+        } else if ((glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS && frame - lastframe > 100)) {
+            UpgradeWindow.upgrade(2, currentPlayer); //zwiekszenie attackspeed
+            lastframe = frame;
+        } else if ((glfwGetKey(window, GLFW_KEY_3) == GLFW_PRESS && frame - lastframe > 100)) {
+            UpgradeWindow.upgrade(3, currentPlayer); //zwiekszenie damage
+            lastframe = frame;
         }
 
     }
 
-    private void AutonomicBotMove(){
+    private void AutonomicBotMove() {
         long currentTime = System.currentTimeMillis();
         getCurrentPlayer().setCurrentRotation(playerAlgorithm.Move(currentTime));
         boolean _isShooted = false;
@@ -214,8 +277,8 @@ public class Screen extends BoardController{
             _isShooted = Shoot(getCurrentPlayer());
         }
         List<Enemy> enemies = new ArrayList<Enemy>();
-        for(Entity entity : getEnemyTable()){
-            enemies.add((Enemy)entity);
+        for (Entity entity : getEnemyTable()) {
+            enemies.add((Enemy) entity);
         }
         playerAlgorithm.FetchCurrentFrameInfo(currentTime, _isShooted, enemies, getCurrentPlayer());
     }
@@ -235,24 +298,21 @@ public class Screen extends BoardController{
             entityCollider.RenderStep();
             entityCollider.CheckColisions();
 
-            /*
-            if(frame%300==0){
-                System.out.println(getCurrentPlayer().getHp());
-                upgradeWindow.NextUpgrade(getCurrentPlayer(), 1);
-                System.out.println(getCurrentPlayer().getMaxHp());
-            }
-             */
 
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
             glColor3f(1.0f, 1.0f, 1.0f);
 
 
-
-            if(!waveHandler.IsRunning(enemyList())){
+            if (!waveHandler.IsRunning(enemyList())) {
                 waveHandler.NextWave();
-                if(playerAlgorithm != null) playerAlgorithm.Init(enemyList(), getCurrentPlayer(), System.currentTimeMillis());
-            }
-            else {
+                UpgradeWindow.nextUpgrade(getCurrentPlayer());
+                System.out.println("Ilość punktów ulepszeń: " + getCurrentPlayer().getCurrentPkt());
+                System.out.println("Max Hp: " + getCurrentPlayer().getMaxHp());
+                System.out.println("Attack Frequency: " + getCurrentPlayer().getAttackFrequency());
+                System.out.println("Damage: " + getCurrentPlayer().getDamage());
+                if (playerAlgorithm != null)
+                    playerAlgorithm.Init(enemyList(), getCurrentPlayer(), System.currentTimeMillis());
+            } else {
                 waveHandler.TrySpawnEnemy(System.currentTimeMillis());
                 if (playerAlgorithm == null) {
                     KeyListener(getCurrentPlayer());
@@ -273,14 +333,14 @@ public class Screen extends BoardController{
         }
     }
 
-    private void InitialScreenSettings(){
+    private void InitialScreenSettings() {
         if (!glfwInit()) {
             throw new IllegalStateException("Unable to initialize GLFW");
         }
         glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
         glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
 
-        window = glfwCreateWindow(screenDimensionX,screenDimensionY, "LWJGL Circle Example", NULL, NULL);
+        window = glfwCreateWindow(screenDimensionX, screenDimensionY, "LWJGL Circle Example", NULL, NULL);
 
         if (window == NULL) {
             throw new RuntimeException("Failed to create the GLFW window");
@@ -300,19 +360,18 @@ public class Screen extends BoardController{
         glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
     }
 
-    private void DestroyWindowAndExit(){
+    private void DestroyWindowAndExit() {
         glfwFreeCallbacks(window);
         glfwDestroyWindow(window);
         glfwTerminate();
     }
-    public void RunGame(Algorithm _playerAlgorithm, Player currentPlayer){
+
+    public void RunGame(Algorithm _playerAlgorithm, Player currentPlayer) {
 
         playerAlgorithm = _playerAlgorithm;
         waveHandler = new WaveHandler(3, "TestWaves0");
 
         InitialScreenSettings();
-
-        upgradeWindow = new UpgradeWindow(false, window);
 
         setCurrentPlayer(currentPlayer);
 
@@ -323,7 +382,6 @@ public class Screen extends BoardController{
 
         _isSpawnedFirstWave = false;
         random = new Random();
-
 
 
         entityCollider = new Collider();
