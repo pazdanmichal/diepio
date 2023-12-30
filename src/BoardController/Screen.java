@@ -8,6 +8,7 @@ import Entity.Enemy;
 import Entity.Bullet;
 import org.lwjgl.glfw.GLFWVidMode;
 
+import javax.swing.plaf.basic.BasicSplitPaneUI;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -17,6 +18,8 @@ import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL.createCapabilities;
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.system.MemoryUtil.NULL;
+import static org.lwjgl.glfw.GLFW.*;
+import static org.lwjgl.opengl.GL11.*;
 
 public class Screen extends BoardController{
     private int screenDimensionX;
@@ -57,13 +60,15 @@ public class Screen extends BoardController{
         this.screenDimensionY = screenDimensionY;
     }
     public void drawCircle(float colorA, float colorB, float colorC, float radius, float centerX, float centerY){
-        centerX += screenDimensionX/2;
-        centerY += screenDimensionY/2;
+        centerX += screenDimensionX/2f;
+        centerY += screenDimensionY/2f;
         glColor3f(colorA, colorB, colorC);
         glBegin(GL_TRIANGLE_FAN);
         glVertex2f(centerX, centerY); // Center of the circle
-        for (int i = 0; i <= 360; i++) {
-            double theta = Math.toRadians(i);
+        int segments = 50; // Increase this for smoother circles
+        double increment = 2.0 * Math.PI / segments;
+        for (int i = 0; i <= segments; i++) {
+            double theta = i * increment;
             float x = (float) (centerX + radius * Math.cos(theta));
             float y = (float) (centerY + radius * Math.sin(theta));
             glVertex2f(x, y);
@@ -72,8 +77,8 @@ public class Screen extends BoardController{
     }
 
     public void drawLine(float colorA, float colorB, float colorC, float startX, float startY, float length, float thickness, float angle) {
-        startX += screenDimensionX/2;
-        startY += screenDimensionY/2;
+        startX += screenDimensionX/2f;
+        startY += screenDimensionY/2f;
         glColor3f(colorA, colorB, colorC);
 
         // Convert angle to radians
@@ -106,7 +111,28 @@ public class Screen extends BoardController{
         glEnd();
     }
 
+    private void DrawHealthBar(Entity entity) {
+
+        if (entity instanceof Player){
+            float barLength = screenDimensionX/12f * entity.getMaxHp(), barThickness = 8;
+
+            // szara ramka
+            drawLine(0.95f,0.95f,0.95f,
+                    -barLength/2f, screenDimensionY/2f * 0.9f,
+                    barLength, barThickness, 0);
+
+            // zielony pasek
+            float healthBarLength = barLength / entity.getMaxHp() * entity.getHp();
+            drawLine(0,1,0,
+                    -healthBarLength/2f, screenDimensionY/2f * 0.9f,
+                    healthBarLength , barThickness, 0);
+        }
+    }
+
     private void DrawEntities(){
+
+        Player player = getCurrentPlayer();
+
         for (Entity entity : getAllyBulletTable()) {
             Bullet currentBullet = (Bullet) entity;
             drawCircle(0, 0, 0.6f, currentBullet.getRadius(), currentBullet.getPosition()[0], currentBullet.getPosition()[1]);
@@ -119,10 +145,11 @@ public class Screen extends BoardController{
             Enemy currentEnemy = (Enemy) enemy;
             drawCircle(1, 0, 0, currentEnemy.getRadius(), currentEnemy.getPosition()[0], currentEnemy.getPosition()[1]);
         }
-        Player entity = getCurrentPlayer();
-        drawLine(0.4f, 0.4f, 0.4f, entity.getPosition()[0], entity.getPosition()[1], entity.getRadius() * entity.getGunLengthMultiply(), entity.getRadius() * entity.getGunWidthMultiply(), entity.getAngle());
-        drawCircle(0, 0.75f, 1, entity.getRadius(), entity.getPosition()[0], entity.getPosition()[1]);
 
+        drawLine(0.4f, 0.4f, 0.4f, player.getPosition()[0], player.getPosition()[1], player.getRadius() * player.getGunLengthMultiply(), player.getRadius() * player.getGunWidthMultiply(), player.getAngle());
+        drawCircle(0, 0.75f, 1, player.getRadius(), player.getPosition()[0], player.getPosition()[1]);
+
+        DrawHealthBar(player);
     }
 
     private boolean PlayerAlive(){
@@ -208,11 +235,13 @@ public class Screen extends BoardController{
             entityCollider.RenderStep();
             entityCollider.CheckColisions();
 
+            /*
             if(frame%300==0){
                 System.out.println(getCurrentPlayer().getHp());
                 upgradeWindow.NextUpgrade(getCurrentPlayer(), 1);
                 System.out.println(getCurrentPlayer().getMaxHp());
             }
+             */
 
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
             glColor3f(1.0f, 1.0f, 1.0f);
@@ -239,6 +268,8 @@ public class Screen extends BoardController{
 
             // Poll for and process events
             glfwPollEvents();
+
+
         }
     }
 
@@ -292,6 +323,8 @@ public class Screen extends BoardController{
 
         _isSpawnedFirstWave = false;
         random = new Random();
+
+
 
         entityCollider = new Collider();
         // Our game

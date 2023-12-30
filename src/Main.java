@@ -18,7 +18,6 @@ public class Main {
                 0, true, 300, 2, (byte) 0,
                 1.5f, 1.7f, 0.65f, 7, 10);
 
-
         // Jakies cos ze sztuczna inteligencja
         Algorithm playerAlgorithm = null; // nowy IdiotBot();
         currentScreen.RunGame(playerAlgorithm, player);

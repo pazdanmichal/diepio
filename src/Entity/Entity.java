@@ -3,13 +3,23 @@ package Entity;
 import java.util.Arrays;
 
 public abstract class Entity {
+    private int maxHp;
     private int hp; //domyslnie 1 dla poczatkowej wersji gry
     private float radius; //typ zmiennej zalezny od skali osi wspolrzednych (do ustalenia)
     private float angle; //kat obrotu jako wartosc zmienno-przecinkowa - wieksza dokladnosc
     private float[] position = new float[2]; //dwie wartosci x i y oznaczajace pozycje
     private float movementSpeed; //poniewaz enemy i bullet ma, a u pleyera domyslne bd 0
 
+    public int getMaxHp() {
+        return maxHp;
+    }
+
+    public void setMaxHp(int maxHp) {
+        this.maxHp = maxHp;
+    }
+
     public Entity(int hp, float radius, float angle, float[] position, float movementSpeed) {
+        this.maxHp = hp;
         this.hp = hp;
         this.radius = radius;
         this.angle = angle;
