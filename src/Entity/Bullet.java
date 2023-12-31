@@ -22,4 +22,9 @@ public class Bullet extends Entity {
         //przyslonieta metoda dla klasy bullet -> usuniecie instancji tej klasy
     }
 
+    @Override
+    public String toString() {
+        return "\nBullet:\n" + super.toString() +
+                "\nisAlly = " + isAlly;
+    }
 }

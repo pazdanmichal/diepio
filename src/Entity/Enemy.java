@@ -11,4 +11,9 @@ public class Enemy extends Mob{
     public void Die(){
         //przyslonieta metoda dla klasy enemy -> usuniecie instancji tej klasy
     }
+
+    @Override
+    public String toString() {
+        return "\nEnemy:\n" + super.toString();
+    }
 }
