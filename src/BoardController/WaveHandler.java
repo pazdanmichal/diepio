@@ -71,9 +71,7 @@ public class WaveHandler {
         for (int i = 0; i < amountOfEnemies; ++i) {
             CreateEnemy(movementSpeed, radius, hp);
         }
-        amount of enemies random.nextInt(1 + (int) (frame / 1000), 3 + (int) (frame / 1000))
-        */
-
+        /*amount of enemies random.nextInt(1 + (int) (frame / 1000), 3 + (int) (frame / 1000))*/
     }
 
     public void TrySpawnEnemy(long _time) {

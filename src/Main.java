@@ -13,11 +13,10 @@ public class Main {
         Player player = new Player(
                 10, 50.0f, 270.0f, new float[]{0.0f, 0.0f},
                 0, true, 300, 2, (byte) 0,
-                1.5f, 1.7f, 0.65f, 7, 10);
-
+                1.5f, 1.7f, 0.65f, 7, 10, 0);
 
         // Jakies cos ze sztuczna inteligencja
-        Algorithm playerAlgorithm = new GroupBot(); // new Algorithm();
+        Algorithm playerAlgorithm = null; // nowy IdiotBot();
         currentScreen.RunGame(playerAlgorithm, player);
     }
 }
