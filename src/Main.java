@@ -1,9 +1,6 @@
-import Algorithms.Algorithm;
-import Algorithms.IdiotBot;
-import Algorithms.Strategy1;
+import Algorithms.*;
 import BoardController.*;
 import Entity.*;
-import java.util.ArrayList;
 
 public class Main {
     public static void main(String[] args) {
@@ -16,10 +13,11 @@ public class Main {
         Player player = new Player(
                 10, 50.0f, 270.0f, new float[]{0.0f, 0.0f},
                 0, true, 300, 2, (byte) 0,
-                1.5f, 1.7f, 0.65f, 7, 10, 0);
+                1.5f, 1.7f, 0.65f, 7, 10);
+
 
         // Jakies cos ze sztuczna inteligencja
-        Algorithm playerAlgorithm = null; // nowy IdiotBot();
+        Algorithm playerAlgorithm = new GroupBot(); // new Algorithm();
         currentScreen.RunGame(playerAlgorithm, player);
     }
 }

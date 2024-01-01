@@ -2,6 +2,7 @@ package BoardController;
 
 import Entity.Enemy;
 import Entity.Entity;
+
 import java.util.AbstractMap.SimpleEntry;
 
 
@@ -18,13 +19,17 @@ public class WaveHandler {
     private int currentWave = 0;
     private String wavePackageName;
 
-    public WaveHandler(int numberOfWaves, String wavePackageName){
+    public WaveHandler(int numberOfWaves, String wavePackageName) {
         this.numberOfWaves = numberOfWaves;
         this.wavePackageName = wavePackageName;
     }
 
-    private void sort(){
-        Collections.sort(enemiesToSpawn, Comparator.comparingLong(SimpleEntry::getValue));
+    public int getCurrentWave() {
+        return currentWave;
+    }
+
+    private void sort() {
+        enemiesToSpawn.sort(Comparator.comparingLong(SimpleEntry::getValue));
     }
 
     public void readEnemiesFromFile(String filename) {
@@ -37,17 +42,18 @@ public class WaveHandler {
                 float radius = Float.parseFloat(enemyData[1]);
                 int hp = Integer.parseInt(enemyData[2]);
                 long delay = Long.parseLong(enemyData[3]);
-                Enemy enemy = CreateEnemy(movementSpeed,radius,hp);
+                Enemy enemy = CreateEnemy(movementSpeed, radius, hp);
                 enemiesToSpawn.add(new SimpleEntry<Enemy, Long>(enemy, delay));
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
-    public void NextWave(){
+
+    public void NextWave() {
         readEnemiesFromFile("src/Waves/" + wavePackageName + "/wave" + currentWave + ".txt");
         System.out.println("Wave " + currentWave + " from package " + wavePackageName + " has been started!");
-        int nextWaveIndex = (currentWave+1)%numberOfWaves;
+        int nextWaveIndex = (currentWave + 1) % numberOfWaves;
         currentWave = nextWaveIndex;
         sort();
 
@@ -56,7 +62,7 @@ public class WaveHandler {
 
         /*
         Random random=new Random();
-        /* SpawnWave(random.nextInt(1 + (int) (frame / 1000), 3 + (int) (frame / 1000)),0.5f,20,1);
+        SpawnWave(random.nextInt(1 + (int) (frame / 1000), 3 + (int) (frame / 1000)),0.5f,20,1);
         int amountOfEnemies = random.nextInt(1 + (int) (frame / 1000), 3 + (int) (frame / 1000));
         float movementSpeed = 5f;
         float radius = 20;
@@ -65,7 +71,9 @@ public class WaveHandler {
         for (int i = 0; i < amountOfEnemies; ++i) {
             CreateEnemy(movementSpeed, radius, hp);
         }
-        /*amount of enemies random.nextInt(1 + (int) (frame / 1000), 3 + (int) (frame / 1000))*/
+        amount of enemies random.nextInt(1 + (int) (frame / 1000), 3 + (int) (frame / 1000))
+        */
+
     }
 
     public void TrySpawnEnemy(long _time) {
@@ -90,7 +98,7 @@ public class WaveHandler {
     }
 
     public boolean IsRunning(List<Enemy> enemies) {
-        if(enemiesToSpawn == null) return false;
+        if (enemiesToSpawn == null) return false;
         if (enemies.isEmpty() && enemiesToSpawn.isEmpty()) return false;
         return true;
     }

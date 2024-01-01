@@ -8,10 +8,8 @@ public class Player extends Mob{
     private float gunLengthMultiply;
     private int bulletSpeed;
 
-    private int currentPkt;
-
     public Player(int hp, float radius, float angle, float[] position, float movementSpeed, boolean canShoot,
-                  float attackFrequency, int damage, byte currentRotation, float rotationSpeed, float gunLengthMultiply, float gunWidthMultiply, int bulletSpeed, int maxHp, int currentPkt) {
+                  float attackFrequency, int damage, byte currentRotation, float rotationSpeed, float gunLengthMultiply, float gunWidthMultiply, int bulletSpeed, int maxHp) {
         super(hp, radius, angle, position, movementSpeed, canShoot, attackFrequency, damage);
         this.currentRotation = currentRotation;
         this.rotationSpeed = rotationSpeed;
@@ -19,20 +17,11 @@ public class Player extends Mob{
         this.gunWidthMultiply = gunWidthMultiply;
         this.bulletSpeed = bulletSpeed;
         this.maxHp = maxHp;
-        this.currentPkt=currentPkt;
     }
-
     public Player() {
         super();
         this.currentRotation = 0;
         this.rotationSpeed = 0;
-    }
-    public int getCurrentPkt() {
-        return currentPkt;
-    }
-
-    public void setCurrentPkt(int currentPkt) {
-        this.currentPkt = currentPkt;
     }
 
     public byte getCurrentRotation() {
