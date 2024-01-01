@@ -2,7 +2,6 @@ package BoardController;
 import Entity.*;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Iterator;
 
 public class Collider extends BoardController{
@@ -73,7 +72,12 @@ public class Collider extends BoardController{
         while (iterator.hasNext()) {
             Entity entity = iterator.next();
             if (entity.getHp() <= 0) {
+                if (entity instanceof Enemy) {
+                    Statistics.killedEnemies++;
+                    System.out.println("Punkty: " + Statistics.killedEnemies);
+                }
                 iterator.remove(); // Remove the current element
+
             }
         }
         return currentEntityTable;
