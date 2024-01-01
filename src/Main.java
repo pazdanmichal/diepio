@@ -1,9 +1,6 @@
-import Algorithms.Algorithm;
-import Algorithms.IdiotBot;
-import Algorithms.Strategy1;
+import Algorithms.*;
 import BoardController.*;
 import Entity.*;
-import java.util.ArrayList;
 
 public class Main {
     public static void main(String[] args) {

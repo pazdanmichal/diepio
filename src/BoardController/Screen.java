@@ -60,6 +60,7 @@ public class Screen extends BoardController {
         this.screenDimensionY = screenDimensionY;
     }
 
+
     public void drawCircle(float colorA, float colorB, float colorC, float radius, float centerX, float centerY) {
         centerX += screenDimensionX / 2f;
         centerY += screenDimensionY / 2f;
@@ -128,6 +129,14 @@ public class Screen extends BoardController {
                     -healthBarLength / 2f, screenDimensionY / 2f * 0.9f,
                     healthBarLength, barThickness, 0);
         }
+        for (Entity enemy : getEnemyTable()) {
+            Enemy currentEnemy = (Enemy) enemy;
+            drawCircle(1, 0, 0, currentEnemy.getRadius(), currentEnemy.getPosition()[0], currentEnemy.getPosition()[1]);
+        }
+        Player entity = getCurrentPlayer();
+        drawLine(0.4f, 0.4f, 0.4f, entity.getPosition()[0], entity.getPosition()[1], entity.getRadius() * entity.getGunLengthMultiply(), entity.getRadius() * entity.getGunWidthMultiply(), entity.getAngle());
+        drawCircle(0, 0.75f, 1, entity.getRadius(), entity.getPosition()[0], entity.getPosition()[1]);
+
     }
 
     private int textureId;
@@ -242,6 +251,7 @@ public class Screen extends BoardController {
             // Spacebar is pressed
             Shoot(currentPlayer);
         }
+
         if ((glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) && (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)) {
             // both A and D are pressed
             currentPlayer.setCurrentRotation((byte) 0);
@@ -266,7 +276,6 @@ public class Screen extends BoardController {
             UpgradeWindow.upgrade(3, currentPlayer); //zwiekszenie damage
             lastframe = frame;
         }
-
     }
 
     private void AutonomicBotMove() {
@@ -298,7 +307,6 @@ public class Screen extends BoardController {
             entityCollider.RenderStep();
             entityCollider.CheckColisions();
 
-
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
             glColor3f(1.0f, 1.0f, 1.0f);
 
@@ -314,6 +322,7 @@ public class Screen extends BoardController {
                     playerAlgorithm.Init(enemyList(), getCurrentPlayer(), System.currentTimeMillis());
             } else {
                 waveHandler.TrySpawnEnemy(System.currentTimeMillis());
+
                 if (playerAlgorithm == null) {
                     KeyListener(getCurrentPlayer());
                 } else {
@@ -369,7 +378,7 @@ public class Screen extends BoardController {
     public void RunGame(Algorithm _playerAlgorithm, Player currentPlayer) {
 
         playerAlgorithm = _playerAlgorithm;
-        waveHandler = new WaveHandler(3, "TestWaves0");
+        waveHandler = new WaveHandler(4, "TestWaves0");
 
         InitialScreenSettings();
 
@@ -380,9 +389,7 @@ public class Screen extends BoardController {
 
         spawnedEnemies = 0;
 
-        _isSpawnedFirstWave = false;
         random = new Random();
-
 
         entityCollider = new Collider();
         // Our game
