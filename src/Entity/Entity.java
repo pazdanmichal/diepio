@@ -55,6 +55,14 @@ public abstract class Entity {
     }
 
     public void setHp(int hp) {
+        // if entity died, execute OnDie function
+        // if damage was dealt, execute OnHit function
+        if (hp <= 0){
+            OnDie();
+        } else if (hp < this.hp){
+            OnHit();
+        }
+        // set hp
         this.hp = hp;
     }
 
@@ -66,17 +74,13 @@ public abstract class Entity {
         this.movementSpeed = movementSpeed;
     }
 
-    public void TakeDamage(int givenDamage){
-        this.hp = this.hp - givenDamage;
-        if(this.hp <= 0){
-            Die();
-        }
-    }
-    public void Die(){
-        //metoda bedzie przyslonieta dla roznych klas, dla enemy i bullet
-        //bedzie kasowac obiekt, a dla playera bedzie konczyc gre
-    }
+    public void OnHit(){
+        //System.out.println("entity was hit");
+    };
 
+    public void OnDie(){
+        //System.out.println("entity died");
+    };
 
     @Override
     public String toString() {
