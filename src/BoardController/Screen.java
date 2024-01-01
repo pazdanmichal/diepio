@@ -60,6 +60,9 @@ public class Screen extends BoardController {
         this.screenDimensionY = screenDimensionY;
     }
 
+    public WaveHandler getWaveHandler(){ return waveHandler; }
+    public long getStartTime(){ return startTime; }
+
 
     public void drawCircle(float colorA, float colorB, float colorC, float radius, float centerX, float centerY) {
         centerX += screenDimensionX / 2f;
@@ -133,9 +136,9 @@ public class Screen extends BoardController {
             Enemy currentEnemy = (Enemy) enemy;
             drawCircle(1, 0, 0, currentEnemy.getRadius(), currentEnemy.getPosition()[0], currentEnemy.getPosition()[1]);
         }
-        Player entity = getCurrentPlayer();
-        drawLine(0.4f, 0.4f, 0.4f, entity.getPosition()[0], entity.getPosition()[1], entity.getRadius() * entity.getGunLengthMultiply(), entity.getRadius() * entity.getGunWidthMultiply(), entity.getAngle());
-        drawCircle(0, 0.75f, 1, entity.getRadius(), entity.getPosition()[0], entity.getPosition()[1]);
+        Player player = getCurrentPlayer();
+        drawLine(0.4f, 0.4f, 0.4f, player.getPosition()[0], player.getPosition()[1], player.getRadius() * player.getGunLengthMultiply(), player.getRadius() * player.getGunWidthMultiply(), player.getAngle());
+        drawCircle(0, 0.75f, 1, player.getRadius(), player.getPosition()[0], player.getPosition()[1]);
 
     }
 
@@ -279,20 +282,16 @@ public class Screen extends BoardController {
     }
 
     private void AutonomicBotMove() {
-        long currentTime = System.currentTimeMillis();
-        getCurrentPlayer().setCurrentRotation(playerAlgorithm.Move(currentTime));
-        boolean _isShooted = false;
-        if (playerAlgorithm.TryShoot(currentTime)) {
-            _isShooted = Shoot(getCurrentPlayer());
+        playerAlgorithm.Init(this);
+        getCurrentPlayer().setCurrentRotation(playerAlgorithm.Move());
+        boolean isShooted = false;
+        if (playerAlgorithm.TryShoot()) {
+            isShooted = Shoot(getCurrentPlayer());
         }
-        List<Enemy> enemies = new ArrayList<Enemy>();
-        for (Entity entity : getEnemyTable()) {
-            enemies.add((Enemy) entity);
-        }
-        playerAlgorithm.FetchCurrentFrameInfo(currentTime, _isShooted, enemies, getCurrentPlayer());
+        playerAlgorithm.FetchCurrentFrameInfo(isShooted);
     }
 
-    private List<Enemy> enemyList() {
+    public List<Enemy> enemyList() {
         List<Enemy> enemies = new ArrayList<Enemy>();
         for (Entity entity : getEnemyTable()) {
             enemies.add((Enemy) entity);
@@ -319,7 +318,7 @@ public class Screen extends BoardController {
                 System.out.println("Attack Frequency: " + getCurrentPlayer().getAttackFrequency());
                 System.out.println("Damage: " + getCurrentPlayer().getDamage());
                 if (playerAlgorithm != null)
-                    playerAlgorithm.Init(enemyList(), getCurrentPlayer(), System.currentTimeMillis());
+                    playerAlgorithm.Init(this);
             } else {
                 waveHandler.TrySpawnEnemy(System.currentTimeMillis());
 
