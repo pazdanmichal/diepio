@@ -223,26 +223,6 @@ public class Screen extends BoardController {
         return true;
     }
 
-    private boolean Shoot(Player currentPlayer) {
-        long currentTime = System.currentTimeMillis();
-        long elapsedTime = currentTime - startTime;
-        if (elapsedTime > currentPlayer.getShootTime() + currentPlayer.getAttackFrequency()) {
-            float[] currentPosition = currentPlayer.getPosition();
-            float rotation = currentPlayer.getAngle();
-
-            double angleRad = Math.toRadians(rotation);
-
-            // Calculate the end point of the line based on length and angle
-            float endX = currentPosition[0] + currentPlayer.getRadius() * currentPlayer.getGunLengthMultiply() * (float) Math.cos(angleRad);
-            float endY = currentPosition[1] + currentPlayer.getRadius() * currentPlayer.getGunLengthMultiply() * (float) Math.sin(angleRad);
-            entityCollider.addEntity(new Bullet(currentPlayer.getDamage(), currentPlayer.getRadius() * currentPlayer.getGunWidthMultiply() * 0.8f, currentPlayer.getAngle(), new float[]{endX, endY}, currentPlayer.getBulletSpeed(), true));
-            currentPlayer.setShootTime(elapsedTime);
-            return true;
-        }
-        return false;
-
-    }
-
     public static void AddEnemy(Enemy enemy) {
         entityCollider.addEntity(enemy);
     }
@@ -252,7 +232,7 @@ public class Screen extends BoardController {
 
         if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) {
             // Spacebar is pressed
-            Shoot(currentPlayer);
+            currentPlayer.Shoot(startTime, entityCollider);
         }
 
         if ((glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) && (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)) {
@@ -286,7 +266,7 @@ public class Screen extends BoardController {
         getCurrentPlayer().setCurrentRotation(playerAlgorithm.Move());
         boolean isShooted = false;
         if (playerAlgorithm.TryShoot()) {
-            isShooted = Shoot(getCurrentPlayer());
+            isShooted = getCurrentPlayer().Shoot(startTime, entityCollider);
         }
         playerAlgorithm.FetchCurrentFrameInfo(isShooted);
     }
