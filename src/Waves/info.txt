@@ -1,9 +1,0 @@
-Stworz Gre tworzac folder z waveami
-np. MyFirstGamePlan i umiesc w tym folderze pliki (wave0.txt wave1.txt... waveN.txt)
-Opis wejsciowych danych nizej
-Przyklad w TestWaves0
-
-Pamietaj zeby ustawic nazwe pakietu i liczbe fal w konstruktorze WaveHandler
-
-// int amount
-// entity: float movementSpeed, float radius, int hp, long delay
