@@ -60,8 +60,13 @@ public class Screen extends BoardController {
         this.screenDimensionY = screenDimensionY;
     }
 
-    public WaveHandler getWaveHandler(){ return waveHandler; }
-    public long getStartTime(){ return startTime; }
+    public WaveHandler getWaveHandler() {
+        return waveHandler;
+    }
+
+    public long getStartTime() {
+        return startTime;
+    }
 
 
     public void drawCircle(float colorA, float colorB, float colorC, float radius, float centerX, float centerY) {
@@ -176,13 +181,13 @@ public class Screen extends BoardController {
         // Renderuj kwadrat z teksturą
         GL11.glBegin(GL11.GL_QUADS);
         GL11.glTexCoord2f(0, 0);
-        GL11.glVertex2f(100, 100);
+        GL11.glVertex2f(700, 0);  // Lewy górny róg: x=700, y=800
         GL11.glTexCoord2f(1, 0);
-        GL11.glVertex2f(200, 100);
+        GL11.glVertex2f(900, 0);  // Prawy górny róg: x=800, y=800
         GL11.glTexCoord2f(1, 1);
-        GL11.glVertex2f(200, 200);
+        GL11.glVertex2f(900, 200);  // Prawy dolny róg: x=800, y=900
         GL11.glTexCoord2f(0, 1);
-        GL11.glVertex2f(100, 200);
+        GL11.glVertex2f(700, 200);  // Lewy dolny róg: x=700, y=900
         GL11.glEnd();
 
         GL11.glDisable(GL11.GL_TEXTURE_2D);
@@ -206,7 +211,7 @@ public class Screen extends BoardController {
         }
 
         drawLine(0.4f, 0.4f, 0.4f, player.getPosition()[0], player.getPosition()[1], player.getRadius() * player.getGunLengthMultiply(), player.getRadius() * player.getGunWidthMultiply(), player.getAngle());
-        drawCircle(0, 0.75f, 1, player.getRadius(), player.getPosition()[0], player.getPosition()[1]);
+        drawCircle(1f, 0.75f, 1f, player.getRadius(), player.getPosition()[0], player.getPosition()[1]);
 
         DrawHealthBar(player);
         if (getCurrentPlayer().getCurrentPkt() > 0) {

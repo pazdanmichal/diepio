@@ -2,7 +2,7 @@ package Entity;
 
 import BoardController.Collider;
 
-public class Player extends Mob{
+public class Player extends Mob {
     private byte currentRotation;//-1 -> lewo; 0 -> stoi; 1 -> prawo
     private float rotationSpeed;
     private int maxHp;
@@ -21,7 +21,7 @@ public class Player extends Mob{
         this.gunWidthMultiply = gunWidthMultiply;
         this.bulletSpeed = bulletSpeed;
         this.maxHp = maxHp;
-        this.currentPkt=currentPkt;
+        this.currentPkt = currentPkt;
     }
 
     public Player() {
@@ -29,6 +29,7 @@ public class Player extends Mob{
         this.currentRotation = 0;
         this.rotationSpeed = 0;
     }
+
     public int getCurrentPkt() {
         return currentPkt;
     }
@@ -48,10 +49,12 @@ public class Player extends Mob{
     public float getRotationSpeed() {
         return rotationSpeed;
     }
+
     //mozliwa zmiana, np. zmiana statystyk w trakcie gry (lvl up)
     public int getMaxHp() {
         return maxHp;
     }
+
     public void setMaxHp(int maxHp) {
         this.maxHp = maxHp;
     }
@@ -60,7 +63,7 @@ public class Player extends Mob{
         this.rotationSpeed = rotationSpeed;
     }
 
-    public void Die(){
+    public void Die() {
         //przyslonieta metoda dla klasy player -> zakonczenie rozgrywki
     }
 
