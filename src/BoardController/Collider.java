@@ -84,7 +84,6 @@ public class Collider extends BoardController{
     }
 
     public void CheckColisions(){
-
         ObjectCollision(getAllyBulletTable(), getEnemyTable());
 
         ArrayList<Entity>playerTable = new ArrayList<>();
@@ -106,6 +105,5 @@ public class Collider extends BoardController{
         setEnemyBulletTable(RemoveDeadEntities(getEnemyBulletTable()));
         setAllyBulletTable(RemoveDeadEntities(getAllyBulletTable()));
         setEnemyTable(RemoveDeadEntities(getEnemyTable()));
-
     }
 }

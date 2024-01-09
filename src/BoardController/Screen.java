@@ -195,7 +195,6 @@ public class Screen extends BoardController {
     }
 
     private void DrawUpgradeWindow() {
-        textureId = loadTexture("src/BoardController/JPGFILES/upgrade.jpeg");
         GL11.glEnable(GL11.GL_TEXTURE_2D);
         GL11.glBindTexture(GL11.GL_TEXTURE_2D, textureId);
 
@@ -245,6 +244,7 @@ public class Screen extends BoardController {
         if (getCurrentPlayer().getCurrentPkt() > 0) {
             DrawUpgradeWindow();
         }
+
 
     }
 
@@ -391,8 +391,10 @@ public class Screen extends BoardController {
         playerAlgorithm = _playerAlgorithm;
         waveHandler = new WaveHandler(4, "TestWaves0");
 
+
         InitialScreenSettings();
 
+        textureId = loadTexture("src/BoardController/JPGFILES/upgrade.jpeg");
         setCurrentPlayer(currentPlayer);
 
         startTime = System.currentTimeMillis();
