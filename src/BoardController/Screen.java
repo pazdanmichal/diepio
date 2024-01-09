@@ -86,6 +86,27 @@ public class Screen extends BoardController {
         glEnd();
     }
 
+    public void drawRectangle(float a1, float b1, float a2, float b2, float a3, float b3, float a4, float b4){
+        GL11.glColor3f(0.0f, 0.0f, 0.0f);
+        GL11.glBegin(GL11.GL_QUADS);
+        GL11.glVertex2f(a1, b1);
+        GL11.glVertex2f(a2, b2);
+        GL11.glVertex2f(a3, b3);
+        GL11.glVertex2f(a4, b4);
+        GL11.glEnd();
+    }
+
+    public void drawUpgradeBar(float startPosX, float startPosY, float cellSizeX, float cellSizeY, float spaceBetweenCells, float numberOfCells){
+        for (int i = 0; i<numberOfCells; ++i){
+            float base = startPosX + i * (cellSizeX + spaceBetweenCells);
+            drawRectangle(
+                    base, startPosY,
+                    base-cellSizeY, startPosY+cellSizeY,
+                    base-cellSizeY+cellSizeX, startPosY+cellSizeY,
+                    base+cellSizeX, startPosY
+            );
+        }
+    }
     public void drawLine(float colorA, float colorB, float colorC, float startX, float startY, float length, float thickness, float angle) {
         startX += screenDimensionX / 2f;
         startY += screenDimensionY / 2f;
@@ -191,6 +212,13 @@ public class Screen extends BoardController {
         GL11.glEnd();
 
         GL11.glDisable(GL11.GL_TEXTURE_2D);
+
+        // najpierw dajecie wspolrzedne gdzie sie ten pasek zaczyna (100,100)
+        // potem dlugosc jednego rownloegloboku (50)
+        // potem jego wysokosc (20)
+        // potem odstep miedzy kolejnymi (5)
+        // potem ilosc ich w pasku
+        drawUpgradeBar(100,100, 50,20,5,3);
     }
 
     private void DrawEntities() {
