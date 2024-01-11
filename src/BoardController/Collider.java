@@ -1,22 +1,25 @@
 package BoardController;
 import Entity.*;
+import Operators.SoundOperator;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 
-public class Collider extends BoardController{
+public class Collider extends BoardController {
 
-    public Collider(){};
+    public Collider(){
 
-    public void RotatePlayer(Entity entity){
-        Player player = (Player) entity;
+    }
+
+    public static void RotatePlayer(){
+        Player player = getCurrentPlayer();
         if (player.getCurrentRotation() == (byte) -1) {
             player.setAngle(player.getAngle() - player.getRotationSpeed());
         } else if (player.getCurrentRotation() == (byte) 1) {
             player.setAngle(player.getAngle() + player.getRotationSpeed());
         }
     }
-    public void MoveEntity(Entity entity){
+    public static void MoveEntity(Entity entity){
 
         float rad = (float) (360/(2*Math.PI));
 
@@ -31,8 +34,8 @@ public class Collider extends BoardController{
     }
 
 
-    public void RenderStep(){
-        RotatePlayer(getCurrentPlayer());
+    public static void RenderStep(){
+        RotatePlayer();
         for (Entity enemyBullet : getEnemyBulletTable()){
             MoveEntity(enemyBullet);
         }
@@ -46,7 +49,7 @@ public class Collider extends BoardController{
         }
 
     }
-    public void ExecuteCollision(Entity object1, Entity object2){
+    public static void ExecuteCollision(Entity object1, Entity object2){
         float[] pos1 = object1.getPosition(), pos2 = object2.getPosition();
         float radius1 = object1.getRadius(), radius2 = object2.getRadius();
         boolean collisionOccurs = Math.sqrt(Math.pow((pos1[0]-pos2[0]),2) + Math.pow((pos1[1]-pos2[1]),2))
@@ -56,10 +59,13 @@ public class Collider extends BoardController{
             int minHp = Math.min(object1.getHp(), object2.getHp());
             object1.setHp(object1.getHp() - minHp);
             object2.setHp(object2.getHp() - minHp);
+            if (object1 instanceof Enemy && object2 instanceof  Player){
+                SoundOperator.playSoundOnThread("src/Sounds/sword.wav", false, 0);
+            }
         }
     }
 
-    public void ObjectCollision(ArrayList<Entity> objectArray1, ArrayList<Entity> objectArray2) {
+    public static void ObjectCollision(ArrayList<Entity> objectArray1, ArrayList<Entity> objectArray2) {
         for (Entity object1: objectArray1) {
             for (Entity object2: objectArray2) {
                 ExecuteCollision(object1, object2);
@@ -67,7 +73,7 @@ public class Collider extends BoardController{
         }
     }
 
-    public ArrayList<Entity> RemoveDeadEntities(ArrayList<Entity>currentEntityTable){
+    public static ArrayList<Entity> RemoveDeadEntities(ArrayList<Entity>currentEntityTable){
         Iterator<Entity> iterator = currentEntityTable.iterator();
         while (iterator.hasNext()) {
             Entity entity = iterator.next();
@@ -83,7 +89,7 @@ public class Collider extends BoardController{
         return currentEntityTable;
     }
 
-    public void CheckColisions(){
+    public static void CheckColisions(){
         ObjectCollision(getAllyBulletTable(), getEnemyTable());
 
         ArrayList<Entity>playerTable = new ArrayList<>();

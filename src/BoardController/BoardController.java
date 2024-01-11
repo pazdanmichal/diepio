@@ -12,24 +12,19 @@ public abstract class BoardController {
     private static int tickRate;
     private static int boardRadius;
 
-    /*public BoardController(ArrayList<Bullet> enemyBulletTable, ArrayList<Bullet> allyBulletTable, ArrayList<Enemy> enemyTable, Player currentPlayer, int boardRadius) {
-        BoardController.enemyBulletTable = enemyBulletTable;
-        BoardController.allyBulletTable = allyBulletTable;
-        BoardController.enemyTable = enemyTable;
-        BoardController.currentPlayer = currentPlayer;
-        BoardController.boardRadius = boardRadius;
-    }*/
 
-    public static void setBoardRadius(int boardRadius) {
-        BoardController.boardRadius = boardRadius;
+    public BoardController(){}
+
+    public static void setBoardRadius(int boardRadiuss) {
+        boardRadius = boardRadiuss;
     }
 
     public static int getBoardRadius() {
         return boardRadius;
     }
 
-    public static void setTickRate(int tickRate) {
-        BoardController.tickRate = tickRate;
+    public static void setTickRate(int tickRatee) {
+        tickRate = tickRatee;
     }
 
     public static int getTickRate() {
@@ -38,46 +33,46 @@ public abstract class BoardController {
 
     public static void addEntity(Entity entity) {
         if (entity instanceof Enemy){
-            BoardController.enemyTable.add((Enemy) entity);
+            enemyTable.add((Enemy) entity);
         } else if (entity instanceof Bullet){
             if (((Bullet) entity).isAlly()){
-                BoardController.allyBulletTable.add((Bullet) entity);
+                allyBulletTable.add((Bullet) entity);
             } else {
-                BoardController.enemyBulletTable.add((Bullet) entity);
+                enemyBulletTable.add((Bullet) entity);
             }
 
         }
     }
 
-    public static ArrayList<Entity> getEnemyBulletTable() {
+    public static  ArrayList<Entity> getEnemyBulletTable() {
         return enemyBulletTable;
     }
 
-    public static void setEnemyBulletTable(ArrayList<Entity> enemyBulletTable) {
-        BoardController.enemyBulletTable = enemyBulletTable;
+    public static void setEnemyBulletTable(ArrayList<Entity> enemyBulletTablee) {
+        enemyBulletTable = enemyBulletTablee;
     }
 
     public static ArrayList<Entity> getAllyBulletTable() {
         return allyBulletTable;
     }
 
-    public static void setAllyBulletTable(ArrayList<Entity> allyBulletTable) {
-        BoardController.allyBulletTable = allyBulletTable;
+    public static  void setAllyBulletTable(ArrayList<Entity> allyBulletTablee) {
+        allyBulletTable = allyBulletTablee;
     }
 
-    public static ArrayList<Entity> getEnemyTable() {
+    public static  ArrayList<Entity> getEnemyTable() {
         return enemyTable;
     }
 
-    public static void setEnemyTable(ArrayList<Entity> enemyTable) {
-        BoardController.enemyTable = enemyTable;
+    public static  void setEnemyTable(ArrayList<Entity> enemyTablee) {
+        enemyTable = enemyTablee;
     }
 
-    public static Player getCurrentPlayer() {
+    public static  Player getCurrentPlayer() {
         return currentPlayer;
     }
 
-    public static void setCurrentPlayer(Player currentPlayer) {
-        BoardController.currentPlayer = currentPlayer;
+    public static void setCurrentPlayer(Player currentPlayerr) {
+        currentPlayer = currentPlayerr;
     }
 }

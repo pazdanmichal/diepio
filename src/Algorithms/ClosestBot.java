@@ -1,6 +1,6 @@
 package Algorithms;
 
-import BoardController.Screen;
+import Operators.ScreenHandler.ScreenOperator;
 import Entity.*;
 
 import java.util.List;
@@ -13,9 +13,9 @@ public class ClosestBot implements Algorithm {
     private Enemy closestEnemy;
 
     @Override
-    public void Init(Screen screen) {
-        this.player = Screen.getCurrentPlayer();
-        this.enemies = screen.enemyList();
+    public void Init() {
+        this.player = ScreenOperator.getCurrentPlayer();
+        this.enemies = ScreenOperator.enemyList();
         closestEnemy = findClosest();
     }
 

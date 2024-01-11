@@ -23,6 +23,4 @@ public class Statistics {
     public void setKilledEnemies(int killedEnemies) {
         Statistics.killedEnemies = killedEnemies;
     }
-
-
 }

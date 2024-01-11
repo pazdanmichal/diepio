@@ -1,5 +1,7 @@
 package Entity;
 
+import Operators.SoundOperator;
+
 public abstract class Mob extends Entity {
     private boolean canShoot;
     private float attackFrequency;
@@ -68,4 +70,5 @@ public abstract class Mob extends Entity {
                 "\ndamage = " + damage +
                 "\nshootTime = " + shootTime;
     }
+
 }

@@ -1,28 +1,18 @@
 package Algorithms;
 
-import BoardController.BoardController;
-import BoardController.Screen;
-import Entity.Enemy;
-import Entity.Player;
-
-import java.util.ArrayList;
-import java.util.List;
+import Operators.ScreenHandler.ScreenOperator;
 
 public class IdiotBot implements Algorithm {
-    private Screen screen;
-    private long startTime;
     private long _time;
 
     @Override
-    public void Init(Screen screen) {
-        this.screen = screen;
-        this.startTime = screen.getStartTime();
+    public void Init() {
 
         _time = System.currentTimeMillis();
     }
 
     private long GetTimeFromStart(long time) {
-        return time - startTime;
+        return time - ScreenOperator.startTime;
     }
 
     @Override

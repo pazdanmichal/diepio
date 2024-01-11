@@ -1,6 +1,7 @@
 package Entity;
 
 import BoardController.Collider;
+import Operators.*;
 
 public class Player extends Mob {
     private byte currentRotation;//-1 -> lewo; 0 -> stoi; 1 -> prawo
@@ -67,10 +68,11 @@ public class Player extends Mob {
         //przyslonieta metoda dla klasy player -> zakonczenie rozgrywki
     }
 
-    public boolean Shoot(long startTime, Collider entityCollider) {
+    public boolean Shoot(long startTime) {
         long currentTime = System.currentTimeMillis();
         long elapsedTime = currentTime - startTime;
         if (elapsedTime > getShootTime() + getAttackFrequency()) {
+            SoundOperator.playSoundOnThread("src/Sounds/fireball.wav", false, -30.0f);
             float[] currentPosition = getPosition();
             float rotation = getAngle();
 
@@ -79,7 +81,7 @@ public class Player extends Mob {
             // Calculate the end point of the line based on length and angle
             float endX = currentPosition[0] + getRadius() * getGunLengthMultiply() * (float) Math.cos(angleRad);
             float endY = currentPosition[1] + getRadius() * getGunLengthMultiply() * (float) Math.sin(angleRad);
-            entityCollider.addEntity(new Bullet(getDamage(), getRadius() * getGunWidthMultiply() * 0.8f, getAngle(), new float[]{endX, endY}, getBulletSpeed(), true));
+            Collider.addEntity(new Bullet(getDamage(), getRadius() * getGunWidthMultiply() * 0.8f, getAngle(), new float[]{endX, endY}, getBulletSpeed(), true));
             setShootTime(elapsedTime);
             return true;
         }

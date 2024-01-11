@@ -1,8 +1,6 @@
 package BoardController;
 
 import Entity.Enemy;
-import Entity.Entity;
-
 import java.util.AbstractMap.SimpleEntry;
 
 
@@ -13,22 +11,22 @@ import java.util.*;
 
 public class WaveHandler {
 
-    private long startTime;
-    private List<SimpleEntry<Enemy, Long>> enemiesToSpawn;
-    private int numberOfWaves;
-    private int currentWave = 0;
-    private String wavePackageName;
+    private static long startTime;
+    private static List<SimpleEntry<Enemy, Long>> enemiesToSpawn;
+    private static int numberOfWaves;
+    private static int currentWave = 0;
+    private static String wavePackageName;
 
     public WaveHandler(int numberOfWaves, String wavePackageName) {
-        this.numberOfWaves = numberOfWaves;
-        this.wavePackageName = wavePackageName;
+        WaveHandler.numberOfWaves = numberOfWaves;
+        WaveHandler.wavePackageName = wavePackageName;
     }
 
-    public int getCurrentWave() {
+    public static int getCurrentWave() {
         return currentWave;
     }
 
-    private void sort() {
+    private static void sort() {
         enemiesToSpawn.sort(Comparator.comparingLong(SimpleEntry::getValue));
     }
 
@@ -53,31 +51,18 @@ public class WaveHandler {
     public void NextWave() {
         readEnemiesFromFile("src/Waves/" + wavePackageName + "/wave" + currentWave + ".txt");
         System.out.println("Wave " + currentWave + " from package " + wavePackageName + " has been started!");
-        int nextWaveIndex = (currentWave + 1) % numberOfWaves;
-        currentWave = nextWaveIndex;
+
+        currentWave = (currentWave + 1) % numberOfWaves;
         sort();
 
-        this.startTime = System.currentTimeMillis();
+        startTime = System.currentTimeMillis();
 
-
-        /*
-        Random random=new Random();
-        SpawnWave(random.nextInt(1 + (int) (frame / 1000), 3 + (int) (frame / 1000)),0.5f,20,1);
-        int amountOfEnemies = random.nextInt(1 + (int) (frame / 1000), 3 + (int) (frame / 1000));
-        float movementSpeed = 5f;
-        float radius = 20;
-        int hp = 1;
-        ////////////
-        for (int i = 0; i < amountOfEnemies; ++i) {
-            CreateEnemy(movementSpeed, radius, hp);
-        }
-        /*amount of enemies random.nextInt(1 + (int) (frame / 1000), 3 + (int) (frame / 1000))*/
     }
 
-    public void TrySpawnEnemy(long _time) {
+    public void TrySpawnEnemy(long _time /*Collider entityCollider*/) {
         if (!enemiesToSpawn.isEmpty()) {
             if (_time - startTime >= enemiesToSpawn.get(0).getValue()) {
-                Screen.AddEnemy(enemiesToSpawn.get(0).getKey());
+                Collider.addEntity(enemiesToSpawn.get(0).getKey());
                 enemiesToSpawn.remove(0);
             }
         }
@@ -91,13 +76,11 @@ public class WaveHandler {
         float y = 700 * (float) Math.sin(angle);
         angle = (360 * angle) / (2 * (float) Math.PI);
         angle += 180;
-        Enemy enemy = new Enemy(hp, radius, angle, new float[]{x, y}, movementSpeed, false, 0, 0);
-        return enemy;
+        return new Enemy(hp, radius, angle, new float[]{x, y}, movementSpeed, false, 0, 0);
     }
 
     public boolean IsRunning(List<Enemy> enemies) {
         if (enemiesToSpawn == null) return false;
-        if (enemies.isEmpty() && enemiesToSpawn.isEmpty()) return false;
-        return true;
+        return !enemies.isEmpty() || !enemiesToSpawn.isEmpty();
     }
 }

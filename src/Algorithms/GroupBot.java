@@ -1,6 +1,7 @@
 package Algorithms;
 
-import BoardController.Screen;
+import Operators.ScreenHandler.ScreenOperator;
+import BoardController.WaveHandler;
 import Entity.*;
 
 import java.util.List;
@@ -44,10 +45,10 @@ public class GroupBot implements Algorithm {
     }
 
     @Override
-    public void Init(Screen screen) {
-        this.player = Screen.getCurrentPlayer();
-        this.enemies = screen.enemyList();
-        fastestBot.Init(screen);
+    public void Init() {
+        this.player = ScreenOperator.getCurrentPlayer();
+        this.enemies = ScreenOperator.enemyList();
+        fastestBot.Init();
 
         if (!enemies.isEmpty()) {
             enemiesCountSection = new int[8];
@@ -55,8 +56,8 @@ public class GroupBot implements Algorithm {
                 enemiesCountSection[(int) mod360(enemy.getAngle() + 180) / (360 / 8)] += 1;
             }
 
-            if (screen.getWaveHandler().getCurrentWave() != waveNr || enemiesCountSection[maxSection] == 0) {
-                waveNr = screen.getWaveHandler().getCurrentWave();
+            if (WaveHandler.getCurrentWave() != waveNr || enemiesCountSection[maxSection] == 0) {
+                waveNr = WaveHandler.getCurrentWave();
 
                 maxSection = 0;
                 for (int i = 1; i < enemiesCountSection.length; i++) {
