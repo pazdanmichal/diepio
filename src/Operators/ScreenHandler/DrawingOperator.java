@@ -224,7 +224,7 @@ public class DrawingOperator {
                     );
 
                     if(j==0){
-                        if((currentPlayer.getMaxHp()-10)/ currentPlayer.getMaxHp()>=i){
+                        if((currentPlayer.getMaxHp()-10)/ currentPlayer.getMaxHpDiff()>=i){
                             drawParallelogram(
                                     base, startPosY,
                                     base - cellSizeY, startPosY + cellSizeY,
