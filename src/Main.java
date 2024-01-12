@@ -1,7 +1,7 @@
-import Algorithms.*;
 import Entity.*;
+import Launcher.Windows.BotSelection;
+import Launcher.Windows.Menu;
 import Operators.ScreenHandler.ScreenOperator;
-import Launcher.Windows.Launcher;
 
 /*
                                 ⠀⠀⠀  ⠀⠀⠀⣠⣤⣤⣤⣤⣤⣶⣦⣤⣄⡀⠀⠀⠀⠀⠀⠀⠀⠀
@@ -34,14 +34,13 @@ public class Main {
                 0, true, 300, 1, (byte) 0,
                 1.5f, 1.7f, 0.65f, 7, 10, 0,2,20,1);
 
-        Launcher launcher = new Launcher(
+        Menu launcher = new Menu(
                 playerAlgorithm -> {
                     ScreenOperator currentScreen = new ScreenOperator(player,60, 1000, 1000, playerAlgorithm);
                     ScreenOperator.RunGame();
                     return true;
                 }
         );
-
 
 
         /*// Dodawanie nowego gracza i inicjalizowanie jego statystyk
