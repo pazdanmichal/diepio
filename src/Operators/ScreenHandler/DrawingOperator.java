@@ -224,7 +224,7 @@ public class DrawingOperator {
                     );
 
                     if(j==0){
-                        if((currentPlayer.getMaxHp()-10)/2>=i){
+                        if((currentPlayer.getMaxHp()-10)/ currentPlayer.getMaxHp()>=i){
                             drawParallelogram(
                                     base, startPosY,
                                     base - cellSizeY, startPosY + cellSizeY,
@@ -235,7 +235,7 @@ public class DrawingOperator {
                         }
                     }
                     else if(j==1){
-                        if((300-currentPlayer.getAttackFrequency())/20>=i){
+                        if((300-currentPlayer.getAttackFrequency())/ currentPlayer.getAttackFrequencyDiff()>=i){
                             drawParallelogram(
                                     base, startPosY,
                                     base - cellSizeY, startPosY + cellSizeY,
@@ -246,7 +246,7 @@ public class DrawingOperator {
                         }
                     }
                     else{
-                        if((currentPlayer.getDamage()-1)>=i){
+                        if((currentPlayer.getDamage()- currentPlayer.getDmgDiff())>=i){
                             drawParallelogram(
                                     base, startPosY,
                                     base - cellSizeY, startPosY + cellSizeY,

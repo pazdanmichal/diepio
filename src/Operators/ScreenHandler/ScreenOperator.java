@@ -132,14 +132,14 @@ public class ScreenOperator extends BoardController {
             currentPlayer.setCurrentRotation((byte) 0);
         }
 
-        if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS&& frame - lastframe > 100&&currentPlayer.getMaxHp()<20) {
-            UpgradeWindow.upgrade(1, currentPlayer); //zwiekszenie maxHP
+        if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS&& frame - lastframe > 100&&currentPlayer.getMaxHp()<10+currentPlayer.getMaxHpDiff()*5) {
+            UpgradeWindow.upgrade(1, currentPlayer, currentPlayer.getMaxHpDiff(), currentPlayer.getAttackFrequencyDiff(), currentPlayer.getDmgDiff()); //zwiekszenie maxHP
             lastframe = frame;
-        } else if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS&& frame - lastframe > 100&&currentPlayer.getAttackFrequency()>200) {
-            UpgradeWindow.upgrade(2, currentPlayer); //zwiekszenie attackspeed
+        } else if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS&& frame - lastframe > 100&&currentPlayer.getAttackFrequency()>300-currentPlayer.getAttackFrequencyDiff()*5) {
+            UpgradeWindow.upgrade(2, currentPlayer, currentPlayer.getMaxHpDiff(), currentPlayer.getAttackFrequencyDiff(), currentPlayer.getDmgDiff()); //zwiekszenie attackspeed
             lastframe = frame;
-        } else if (glfwGetKey(window, GLFW_KEY_3) == GLFW_PRESS&& frame - lastframe > 100&&currentPlayer.getDamage()<6) {
-            UpgradeWindow.upgrade(3, currentPlayer); //zwiekszenie damage
+        } else if (glfwGetKey(window, GLFW_KEY_3) == GLFW_PRESS&& frame - lastframe > 100&&currentPlayer.getDamage()<1+currentPlayer.getDmgDiff()*5) {
+            UpgradeWindow.upgrade(3, currentPlayer, currentPlayer.getMaxHpDiff(), currentPlayer.getAttackFrequencyDiff(), currentPlayer.getDmgDiff()); //zwiekszenie damage
             lastframe = frame;
         }
     }

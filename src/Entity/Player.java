@@ -10,11 +10,15 @@ public class Player extends Mob {
     private float gunWidthMultiply;
     private float gunLengthMultiply;
     private int bulletSpeed;
-
     private int currentPkt;
+    private int maxHpDiff;
+    private float attackFrequencyDiff;
+    private int dmgDiff;
+
+
 
     public Player(int hp, float radius, float angle, float[] position, float movementSpeed, boolean canShoot,
-                  float attackFrequency, int damage, byte currentRotation, float rotationSpeed, float gunLengthMultiply, float gunWidthMultiply, int bulletSpeed, int maxHp, int currentPkt) {
+                  float attackFrequency, int damage, byte currentRotation, float rotationSpeed, float gunLengthMultiply, float gunWidthMultiply, int bulletSpeed, int maxHp, int currentPkt, int maxHpDiff, float attackFrequencyDiff, int dmgDiff) {
         super(hp, radius, angle, position, movementSpeed, canShoot, attackFrequency, damage);
         this.currentRotation = currentRotation;
         this.rotationSpeed = rotationSpeed;
@@ -23,6 +27,9 @@ public class Player extends Mob {
         this.bulletSpeed = bulletSpeed;
         this.maxHp = maxHp;
         this.currentPkt = currentPkt;
+        this.maxHpDiff=maxHpDiff;
+        this.attackFrequencyDiff=attackFrequencyDiff;
+        this.dmgDiff=dmgDiff;
     }
 
     public Player() {
@@ -112,4 +119,9 @@ public class Player extends Mob {
     public void setBulletSpeed(int bulletSpeed) {
         this.bulletSpeed = bulletSpeed;
     }
+    public int getMaxHpDiff() {return maxHpDiff;}
+
+    public float getAttackFrequencyDiff() {return attackFrequencyDiff;}
+
+    public int getDmgDiff() {return dmgDiff;}
 }
