@@ -16,6 +16,8 @@ public class UIButton extends JButton {
     private Color backgroundColor = new Color(171, 131, 82);
     private Color borderColor = new Color(194, 162, 0);
     private Color hoverBackgroundColor = new Color(186, 64, 34);
+    private Color onPressedColor = new Color(148, 0, 0);
+    private Color _backgroundColor = new Color(171, 131, 82);
     public UIButton(String text, Runnable function) {
         super(text);
         this.addActionListener(new ActionListener() {
@@ -38,13 +40,45 @@ public class UIButton extends JButton {
         hoverMouseEffect();
     }
 
-    public UIButton(String text, Runnable function, Color backgroundColor, Color borderColor){
+    public UIButton(Icon icon, Runnable function){
+        super(icon);
+        this.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                function.run();
+            }
+        });
+        this.setBackground(backgroundColor);
+        setContentAreaFilled(false);
+        setFocusPainted(false);
+        setBorderPainted(false);
+        try {
+            Font font = Font.createFont(Font.TRUETYPE_FONT, new File("font.otf"));
+            font = font.deriveFont(Font.PLAIN, 18); // Set font size
+            this.setFont(font);
+        } catch (FontFormatException | IOException e) {
+            e.printStackTrace();
+        }
+        hoverMouseEffect();
+    }
+
+    public UIButton(String text, Runnable function, Color backgroundColor, Color borderColor, Color hoverBackgroundColor){
         this(text, function);
         this.backgroundColor = backgroundColor;
+        this._backgroundColor = backgroundColor;
         this.borderColor = borderColor;
+        this.hoverBackgroundColor = hoverBackgroundColor;
         this.setBackground(backgroundColor);
     }
 
+    public void changeStatus(boolean isPressed){
+        if(isPressed){
+            this.backgroundColor = onPressedColor;
+        } else {
+            this.backgroundColor = _backgroundColor;
+        }
+        this.setBackground(backgroundColor);
+    }
     private void hoverMouseEffect(){
         this.addMouseListener(new MouseAdapter() {
             @Override
