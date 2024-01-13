@@ -18,14 +18,10 @@ public class UIButton extends JButton {
     private Color hoverBackgroundColor = new Color(186, 64, 34);
     private Color onPressedColor = new Color(148, 0, 0);
     private Color _backgroundColor = new Color(171, 131, 82);
-    public UIButton(String text, Runnable function) {
+
+    public UIButton(String text){
         super(text);
-        this.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                function.run();
-            }
-        });
+
         this.setBackground(backgroundColor);
         setContentAreaFilled(false);
         setFocusPainted(false);
@@ -38,6 +34,24 @@ public class UIButton extends JButton {
             e.printStackTrace();
         }
         hoverMouseEffect();
+    }
+
+    public void addFunction(Runnable function){
+        this.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                function.run();
+            }
+        });
+    }
+    public UIButton(String text, Runnable function) {
+        this(text);
+        this.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                function.run();
+            }
+        });
     }
 
     public UIButton(Icon icon, Runnable function){
@@ -64,6 +78,15 @@ public class UIButton extends JButton {
 
     public UIButton(String text, Runnable function, Color backgroundColor, Color borderColor, Color hoverBackgroundColor){
         this(text, function);
+        this.backgroundColor = backgroundColor;
+        this._backgroundColor = backgroundColor;
+        this.borderColor = borderColor;
+        this.hoverBackgroundColor = hoverBackgroundColor;
+        this.setBackground(backgroundColor);
+    }
+
+    public UIButton(String text, Color backgroundColor, Color borderColor, Color hoverBackgroundColor){
+        this(text);
         this.backgroundColor = backgroundColor;
         this._backgroundColor = backgroundColor;
         this.borderColor = borderColor;
