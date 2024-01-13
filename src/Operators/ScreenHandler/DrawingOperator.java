@@ -38,15 +38,17 @@ public class DrawingOperator {
         // Dorzucając kolejne ścieżki ZAWSZE NA SAM DÓŁ
         String[] textureNames = new String[] {
 
-                "src/Images/upgrade.jpeg",      // 0
-                "src/Images/rycerz.png",        // 1
-                "src/Images/tlo.png",           // 2
-                "src/Images/dragon.png",        // 3
-                "src/Images/rycerz2.png",       // 4
-                "src/Images/serce.png",         // 5
-                "src/Images/luk.png",           // 6
-                "src/Images/miecz.png",         // 7
-                "src/Images/fireball.png"       // 8
+                "Images/upgrade.jpeg",      // 0
+                "Images/rycerz.png",        // 1
+                "Images/tlo.png",           // 2
+                "Images/dragon.png",        // 3
+                "Images/rycerz2.png",       // 4
+                "Images/serce.png",         // 5
+                "Images/luk.png",           // 6
+                "Images/miecz.png",         // 7
+                "Images/fireball.png",      // 8
+                "Images/nextwave.png"       // 9
+
 
         };
 
@@ -186,8 +188,8 @@ public class DrawingOperator {
 
                     float cellSizeX2 = cellSizeX - 35;
                     float[][] pos = new float[][]{
-                        {base - cellSizeX2 + 8, startPosY - cellSizeX2 + 10},
-                        {base + cellSizeX2 + 8, startPosY - cellSizeX2 + 10},
+                            {base - cellSizeX2 + 8, startPosY - cellSizeX2 + 10},
+                            {base + cellSizeX2 + 8, startPosY - cellSizeX2 + 10},
                             {base + cellSizeX2 + 8, startPosY + cellSizeX2 + 10},                  // A2 B2
                             {base - cellSizeX2 + 8, startPosY + cellSizeX2 + 10}                   // A1 B1
                     };
@@ -204,16 +206,16 @@ public class DrawingOperator {
                                 base - cellSizeY + cellSizeX+3, startPosY + cellSizeY+3,
                                 base + cellSizeX +8, startPosY-3,
                                 1,0,1,1
-                    );}
+                        );}
                     else{
                         drawParallelogram(
-                                    base- 3, startPosY-3,
-                                    base - cellSizeY -8,startPosY + cellSizeY+3,
-                                    base - cellSizeY + cellSizeX+3, startPosY + cellSizeY+3,
-                                    base + cellSizeX +8, startPosY-3,
-                                    0,0,0,1
-                            );
-                        }
+                                base- 3, startPosY-3,
+                                base - cellSizeY -8,startPosY + cellSizeY+3,
+                                base - cellSizeY + cellSizeX+3, startPosY + cellSizeY+3,
+                                base + cellSizeX +8, startPosY-3,
+                                0,0,0,1
+                        );
+                    }
 
                     drawParallelogram(
                             base, startPosY,
@@ -332,5 +334,6 @@ public class DrawingOperator {
 
 
 
-    }
+
+}
 

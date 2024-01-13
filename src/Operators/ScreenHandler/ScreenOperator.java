@@ -64,9 +64,13 @@ public class ScreenOperator extends BoardController {
 
     //---------------------------------------// METODY \\-----------------------------------------\\
 
+    public static long getFrame() {
+        return frame;
+    }
+
     //----------- metoda RunGame - wywoływana bezpośrednio z pliku Main
     public static void RunGame(){
-        SoundOperator.playSoundOnThread("src/Sounds/background.wav", true, -10.0f);
+        SoundOperator.playSoundOnThread("Sounds/background.wav", true, -10.0f);
 
         RenderStepOperator.GameLoop();      // Główna pętla gry
         SoundOperator.StopSounds();

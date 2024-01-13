@@ -4,6 +4,8 @@ import Algorithms.Algorithm;
 import BoardController.*;
 import Entity.*;
 
+import java.util.ArrayList;
+
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL11.glColor3f;
@@ -43,7 +45,12 @@ public class RenderStepOperator extends BoardController {
     //----------------------------// GŁÓWNA METODA - GAME LOOP \\--------------------------------\\
     // Metoda GameLoop odpowiada za wywoływanie wszystkich podrzędnych metod zdefiniowanych dalej \\
 
+
     public static void GameLoop() {
+        ArrayList<Long> frameArray = new ArrayList<>();
+        int a = -1;
+        frameArray.add((long)0);
+
         while (!glfwWindowShouldClose(ScreenOperator.window) && player.getHp() > 0) {
 
             ScreenOperator.frame += 1;
@@ -59,20 +66,37 @@ public class RenderStepOperator extends BoardController {
             drawingOperator.renderImage(drawingOperator.posCalc(new float[]{0,0}, 1000/(float)Math.sqrt(2), 0), 2);
 
             //new float[][] {{0,0},{1000,0},{1000,1000},{0,1000}}
+            RenderEntities();
+
+
+
 
             if (!waveHandler.IsRunning(ScreenOperator.enemyList())) {
 
+                frameArray.add(ScreenOperator.getFrame());
+                a++;
 
-                waveHandler.NextWave();
-                UpgradeWindow.nextUpgrade(player);
+                if(ScreenOperator.getFrame() < frameArray.get(a) + 150){
+                    if(frameArray.get(a) != ScreenOperator.getFrame()) {
+                        frameArray.remove(ScreenOperator.getFrame());
 
-                System.out.println("Ilość punktów ulepszeń: " + player.getCurrentPkt());
-                System.out.println("Max Hp: " + player.getMaxHp());
-                System.out.println("Attack Frequency: " + player.getAttackFrequency());
-                System.out.println("Damage: " + player.getDamage());
+                    }
+                    a--;
+                    drawingOperator.renderImage(drawingOperator.posCalc(new float[]{0,-140}, 550/(float)Math.sqrt(2), -90), 9);
+                } else {
+                    a++;
+                    waveHandler.NextWave();
 
-                if (playerAlgorithm != null) {
-                    playerAlgorithm.Init();
+                    UpgradeWindow.nextUpgrade(player);
+
+                    System.out.println("Ilość punktów ulepszeń: " + player.getCurrentPkt());
+                    System.out.println("Max Hp: " + player.getMaxHp());
+                    System.out.println("Attack Frequency: " + player.getAttackFrequency());
+                    System.out.println("Damage: " + player.getDamage());
+
+                    if (playerAlgorithm != null) {
+                        playerAlgorithm.Init();
+                    }
                 }
 
             } else {
@@ -91,7 +115,8 @@ public class RenderStepOperator extends BoardController {
             }
 
 
-            RenderEntities();
+
+
             // Swap the front and back buffers
             //long startTime = System.currentTimeMillis();
             //System.out.println(System.currentTimeMillis() - startTime);

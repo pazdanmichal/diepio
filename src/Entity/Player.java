@@ -79,7 +79,7 @@ public class Player extends Mob {
         long currentTime = System.currentTimeMillis();
         long elapsedTime = currentTime - startTime;
         if (elapsedTime > getShootTime() + getAttackFrequency()) {
-            SoundOperator.playSoundOnThread("src/Sounds/fireball.wav", false, -30.0f);
+            SoundOperator.playSoundOnThread("Sounds/fireball.wav", false, -30.0f);
             float[] currentPosition = getPosition();
             float rotation = getAngle();
 

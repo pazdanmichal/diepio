@@ -60,7 +60,7 @@ public class Collider extends BoardController {
             object1.setHp(object1.getHp() - minHp);
             object2.setHp(object2.getHp() - minHp);
             if (object1 instanceof Enemy && object2 instanceof  Player){
-                SoundOperator.playSoundOnThread("src/Sounds/sword.wav", false, 0);
+                SoundOperator.playSoundOnThread("Sounds/sword.wav", false, 0);
             }
         }
     }

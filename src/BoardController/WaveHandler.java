@@ -17,6 +17,10 @@ public class WaveHandler {
     private static int currentWave = 0;
     private static String wavePackageName;
 
+    public static List<SimpleEntry<Enemy, Long>> getEnemiesToSpawn() {
+        return enemiesToSpawn;
+    }
+
     public WaveHandler(int numberOfWaves, String wavePackageName) {
         WaveHandler.numberOfWaves = numberOfWaves;
         WaveHandler.wavePackageName = wavePackageName;
@@ -49,6 +53,7 @@ public class WaveHandler {
     }
 
     public void NextWave() {
+
         readEnemiesFromFile("src/Waves/" + wavePackageName + "/wave" + currentWave + ".txt");
         System.out.println("Wave " + currentWave + " from package " + wavePackageName + " has been started!");
 
