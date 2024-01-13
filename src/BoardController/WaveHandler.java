@@ -54,7 +54,7 @@ public class WaveHandler {
 
     public void NextWave() {
 
-        readEnemiesFromFile("src/Waves/" + wavePackageName + "/wave" + currentWave + ".txt");
+        readEnemiesFromFile("Waves/" + wavePackageName + "/wave" + currentWave + ".txt");
         System.out.println("Wave " + currentWave + " from package " + wavePackageName + " has been started!");
 
         currentWave = (currentWave + 1) % numberOfWaves;

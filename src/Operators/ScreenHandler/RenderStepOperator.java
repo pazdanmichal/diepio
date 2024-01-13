@@ -37,7 +37,7 @@ public class RenderStepOperator extends BoardController {
         player = getCurrentPlayer();
 
         playerAlgorithm = playerAlgorithmm;
-        waveHandler = new WaveHandler(4, "TestWaves0");
+        waveHandler = new WaveHandler(4, "GamePlan0");
 
         drawingOperator = new DrawingOperator(ScreenOperator.screenSize);
     }
