@@ -26,7 +26,7 @@ import Operators.ScreenHandler.ScreenOperator;
 */
 
 public class Main {
-
+//cipsko
     public static void main(String[] args) {
 
         Player player = new Player(
